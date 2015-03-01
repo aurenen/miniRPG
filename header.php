@@ -31,9 +31,9 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="login.html">Login</a></li>
-          <li class="active"><a href="register.html">Register <span class="sr-only">(current)</span></a></li>
+          <li><a href="index.php">Home</a></li>
+          <li><a href="login.php">Login</a></li>
+          <li class="active"><a href="register.php">Register <span class="sr-only">(current)</span></a></li>
 
         </ul>
         </div><!--/.navbar-collapse -->
