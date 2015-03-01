@@ -9,13 +9,13 @@ $db_name = 'cs490';
 $db_host = 'localhost';
 
 // URL to site. ('http://example.com/')
-$root_url = '';
+$root_url = 'http://localhost/~tsukete/cs490/miniRPG/';
 // Absolute path to site on server. (Add trailing slash!)
-$proj_path = '';
+$proj_path = '/Users/tsukete/Sites/cs490/miniRPG/';
 // Domain where cookie will work. ('example.com')
-$cookie_domain = '';
+$cookie_domain = 'localhost/~tsukete';
 // Path on domain where cookie will work. ('/folder/')
-$cookie_path = '';
+$cookie_path = '/cs490/';
 
 session_set_cookie_params(3600, $cookie_path, $cookie_domain, false, true);
 date_default_timezone_set('America/Los_Angeles');

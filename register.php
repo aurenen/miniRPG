@@ -1,6 +1,6 @@
 <?php
-require_once "utils/functions.php";
 include_once "header.php";
+require_once "utils/functions.php";
 
 if(isset($_POST['submit'])) {
   $login_user = cleanPOST($_POST['login_user']);
@@ -20,13 +20,10 @@ if(isset($_POST['submit'])) {
     exit();
   }
   
-  else {
-
-    registerAccount($login_user, $login_pass, $login_chara);
-  }
+  registerAccount($login_user, $login_pass, $login_chara, $login_gender);
 }
 
-else {
+else { // set $url to page.php?QUERY
   if (isset($_SERVER['QUERY_STRING'])) {
     $url = $_SERVER['QUERY_STRING'];
     parse_str($url, $vars);
@@ -36,11 +33,17 @@ else {
     }
 ?>
 
-      <form class="form-horizontal">
+      <form class="form-horizontal" role="form" action="register.php" method="post">
         <fieldset>
           <h2>Register for an account</h2>
             <?php if ($url == "error") { ?>
             <div class="alert alert-danger" role="alert">Email already registered.</div>
+
+            <?php } if ($url == "invalid_email") { ?>
+            <div class="alert alert-danger" role="alert">Email is invalid.</div>
+
+            <?php } if ($url == "invalid_password") { ?>
+            <div class="alert alert-danger" role="alert">Your password is too long.</div>
 
             <?php } if ($url == "required") { ?>
             <div class="alert alert-danger" role="alert">Please fill in all fields.</div>
@@ -62,19 +65,19 @@ else {
             </div>
 
             <div class="col-sm-7 col-sm-pull-5">
-              <div class="form-group<?php if ($url == "error") echo " has-error"; ?>">
+              <div class="form-group<?php if ($url == "error" || $url== "invalid_email") echo " has-error"; ?>">
                 <label for="inputEmail" class="col-sm-3 control-label">Email</label>
                 <div class="col-sm-9">
                   <input name="login_user" type="text" class="form-control" id="inputEmail" placeholder="Email">
                 </div>
               </div>
-              <div class="form-group<?php if ($url == "password") echo " has-error"; ?>">
+              <div class="form-group<?php if ($url == "password" || $url == "invalid_password") echo " has-error"; ?>">
                 <label for="inputPassword" class="col-sm-3 control-label">Password</label>
                 <div class="col-sm-9">
                   <input name="login_pass" type="password" class="form-control" id="inputPassword" placeholder="Password">
                 </div>
               </div>
-              <div class="form-group<?php if ($url == "password") echo " has-error"; ?>">
+              <div class="form-group<?php if ($url == "password" || $url == "invalid_password") echo " has-error"; ?>">
                 <div class="col-sm-9 col-sm-offset-3">
                   <input name="login_pass2" type="password" class="form-control" id="inputPassword" placeholder="Password again">
                 </div>
@@ -113,7 +116,7 @@ else {
               </div>
               <div class="form-group">
                 <div class="col-sm-9 col-sm-offset-3">
-                  <button type="submit" class="btn btn-success">Submit</button>
+                  <button type="submit" name="submit" class="btn btn-success">Submit</button>
                   <button type="reset" class="btn btn-default">Cancel</button>
                 </div>
               </div>
