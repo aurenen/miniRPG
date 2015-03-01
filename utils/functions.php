@@ -1,4 +1,7 @@
 <?php
+session_start();
+session_regenerate_id(true);
+
 require_once 'config.php';
 require_once 'PasswordHash.php';
 
@@ -66,14 +69,14 @@ function registerAccount($email, $pass, $chara, $gender) {
     }
 
     // check if email already registered
-    // $sql = "SELECT * FROM Users WHERE email='$email'";
+    $sql = "SELECT * FROM Users WHERE email=?";
 
-    // $go = $db->query($sql);
-    // if ($go === true) { 
-    //     header('Location: register.php?error');
-    //     exit();
-    // }
-    // else { // if no matching email in db
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param('s', $email);
+    if ($stmt->execute()) { 
+        header('Location: register.php?error');
+        exit();
+    }
 
     // hash password before inserting into db
     $hasher = new PasswordHash(8, FALSE);
@@ -84,14 +87,17 @@ function registerAccount($email, $pass, $chara, $gender) {
 
     $one = 1;
     $zero = 0;
-    $class = 'Novice';
     $null = NULL;
 
-    ($stmt = $db->prepare('INSERT INTO Users (email, password, level, character_name, character_class, gender, stat_id, money, location)
-                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
-        || fail('MySQL prepare', $db->error);
-    $stmt->bind_param('ssisssiii', $user, $hash, $one, $chara, $class, $gender, $null, $zero, $zero)
-        || fail('MySQL bind_param', $db->error);
+    $stmt = $db->prepare('
+        INSERT INTO Users (email, password, level, character_name, character_class, gender, stat_id, money, location)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ');
+
+    if (!$stmt) 
+        fail('MySQL prepare', $db->error);
+    if (!$stmt->bind_param('ssisisiii', $email, $hash, $one, $chara, $zero, $gender, $null, $zero, $zero))
+        fail('MySQL bind_param', $db->error);
     if (!$stmt->execute()) {
     /* Figure out why this failed - maybe the username is already taken?
      * It could be more reliable/portable to issue a SELECT query here.  We would
@@ -122,6 +128,65 @@ function registerAccount($email, $pass, $chara, $gender) {
 
     db_disconnect();
 }
+
+
+function login($user, $pass) {
+    global $db;
+    db_connect();
+
+    $user = cleanSQL($user);
+    $pass = cleanSQL($pass);
+
+    // check if email is real
+    if (!preg_match('/^[a-zA-Z0-9_.@-]{1,60}$/', $user)) { 
+        header('Location: register.php?invalid_email');
+        exit();
+    }
+    // check password length, bcrypt only uses the first 72 characters
+    if (strlen($pass) > 72) { 
+        header('Location: register.php?invalid_password');
+        exit();
+    }
+
+    // check if email exists
+    $sql = "SELECT * FROM Users WHERE email=?";
+
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param('s', $email);
+    if (!$stmt->execute()) { 
+        header('Location: login.php?error');
+        exit();
+    }
+
+    /*
+    if($rs->num_rows == 0) {  // User not found   
+        header('Location: login.php?failed');
+        exit();
+    }
+     */
+     
+    //$result = mysql_fetch_array($rs, MYSQL_ASSOC);
+    $result = mysql_fetch_array($rs);
+     
+    if($pass != $result['u_password']) { // Incorrect password. So, redirect to login_form again.
+        header('Location: login.php?error');
+        exit();
+    }
+    else { // Redirect to home page after successful login.
+        $_SESSION['active'] = true;
+        $_SESSION['user_id'] = $result['u_id'];
+        $_SESSION['user_name'] = $result['u_charactername'];
+        $_SESSION['user_email'] = $result['u_email'];
+    $_SESSION['user_class'] = $result['u_class'];
+
+    //DEBUG
+    //print_r($_SESSION);
+
+        // setCookieInfo();
+        // redirectHome();
+    }
+}
+
 
 function db_disconnect() {
     global $db;

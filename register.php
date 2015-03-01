@@ -1,6 +1,6 @@
 <?php
-include_once "header.php";
-require_once "utils/functions.php";
+require_once 'utils/functions.php';
+include_once 'header.php';
 
 if(isset($_POST['submit'])) {
   $login_user = cleanPOST($_POST['login_user']);
@@ -27,10 +27,10 @@ else { // set $url to page.php?QUERY
   if (isset($_SERVER['QUERY_STRING'])) {
     $url = $_SERVER['QUERY_STRING'];
     parse_str($url, $vars);
-    } 
+  } 
   else {
     $url = $_GET;
-    }
+  }
 ?>
 
       <form class="form-horizontal" role="form" action="register.php" method="post">
@@ -126,4 +126,4 @@ else { // set $url to page.php?QUERY
         </fieldset>
       </form>
 
-<?php } include_once "footer.php"; ?>
+<?php } include_once 'footer.php';
