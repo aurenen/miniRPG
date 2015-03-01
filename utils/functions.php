@@ -69,11 +69,12 @@ function registerAccount($email, $pass, $chara, $gender) {
     }
 
     // check if email already registered
-    $sql = "SELECT * FROM Users WHERE email=?";
+    $sql = "SELECT * FROM users WHERE email=?";
 
     $stmt = $db->prepare($sql);
     $stmt->bind_param('s', $email);
     if ($stmt->execute()) { 
+        $stmt->close();
         header('Location: register.php?error');
         exit();
     }
@@ -89,15 +90,15 @@ function registerAccount($email, $pass, $chara, $gender) {
     $zero = 0;
     $null = NULL;
 
-    $stmt = $db->prepare('
-        INSERT INTO Users (email, password, level, character_name, character_class, gender, stat_id, money, location)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ');
+    $sql = "INSERT INTO users (email, password, level, character_name, character_class, gender, stat_id, money, location)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $db->prepare($sql);
 
     if (!$stmt) 
-        fail('MySQL prepare', $db->error);
+        fail('MySQL registration prepare', $db->error);
     if (!$stmt->bind_param('ssisisiii', $email, $hash, $one, $chara, $zero, $gender, $null, $zero, $zero))
-        fail('MySQL bind_param', $db->error);
+        fail('MySQL registration bind_param', $db->error);
     if (!$stmt->execute()) {
     /* Figure out why this failed - maybe the username is already taken?
      * It could be more reliable/portable to issue a SELECT query here.  We would
@@ -109,7 +110,7 @@ function registerAccount($email, $pass, $chara, $gender) {
             exit();
         }
         else
-            fail('MySQL execute', $db->error);
+            fail('MySQL registration execute', $db->error);
     }
 
     // $sql = "INSERT INTO Users (email, password, level, character_name, character_class, gender, stat_id, money, location)
@@ -124,8 +125,6 @@ function registerAccount($email, $pass, $chara, $gender) {
         exit();
     }
 
-    $stmt->close();
-
     db_disconnect();
 }
 
@@ -139,52 +138,79 @@ function login($user, $pass) {
 
     // check if email is real
     if (!preg_match('/^[a-zA-Z0-9_.@-]{1,60}$/', $user)) { 
-        header('Location: register.php?invalid_email');
+        header('Location: login.php?error');
         exit();
     }
     // check password length, bcrypt only uses the first 72 characters
     if (strlen($pass) > 72) { 
-        header('Location: register.php?invalid_password');
+        header('Location: login.php?error');
         exit();
     }
 
     // check if email exists
-    $sql = "SELECT * FROM Users WHERE email=?";
+    $sql = "SELECT * FROM users WHERE email=?";
 
     $stmt = $db->prepare($sql);
-    $stmt->bind_param('s', $email);
-    if (!$stmt->execute()) { 
-        header('Location: login.php?error');
-        exit();
-    }
+    $stmt->bind_param('s', $user);
 
-    /*
-    if($rs->num_rows == 0) {  // User not found   
+    $result = $stmt->execute();
+    $stmt->close();
+
+    if (!$result) { 
         header('Location: login.php?failed');
         exit();
     }
-     */
-     
-    //$result = mysql_fetch_array($rs, MYSQL_ASSOC);
-    $result = mysql_fetch_array($rs);
-     
-    if($pass != $result['u_password']) { // Incorrect password. So, redirect to login_form again.
+
+    // hash password before inserting into db
+    $hasher = new PasswordHash(8, FALSE);
+
+    $sql = "SELECT password, uid FROM users WHERE email=?";
+
+    mysqli_report(MYSQLI_REPORT_ALL);
+
+    $hash = '*'; // In case the user is not found
+
+    $stmt = $db->prepare($sql);
+    if (!$stmt) 
+        fail('MySQL login prepare', $stmt->error);
+    if (!$stmt->bind_param('s', $user))
+        fail('MySQL login bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL login execute', $stmt->error);
+    if (!$stmt->bind_result($hash, $uid))
+        fail('MySQL login bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL login fetch', $stmt->error);
+
+    if ($hasher->CheckPassword($pass, $hash)) { // Redirect to home page after successful login.
+        // $_SESSION['active'] = true;
+        // $_SESSION['user_id'] = $result['u_id'];
+        // $_SESSION['user_name'] = $result['u_charactername'];
+        // $_SESSION['user_email'] = $result['u_email'];
+        // $_SESSION['user_class'] = $result['u_class'];
+
+        // call a function to query for all user info based on $uid
+
+        header('Location: index.php');
+        exit();
+    } 
+    else { // Incorrect password. So, redirect to login_form again.
         header('Location: login.php?error');
         exit();
     }
-    else { // Redirect to home page after successful login.
-        $_SESSION['active'] = true;
-        $_SESSION['user_id'] = $result['u_id'];
-        $_SESSION['user_name'] = $result['u_charactername'];
-        $_SESSION['user_email'] = $result['u_email'];
-    $_SESSION['user_class'] = $result['u_class'];
+    unset($hasher);
+     
+    // $result = mysql_fetch_array($rs, MYSQL_ASSOC);
+    // $result = mysql_fetch_array($rs);
 
     //DEBUG
     //print_r($_SESSION);
 
         // setCookieInfo();
         // redirectHome();
-    }
+    
+    $stmt->close();
+    db_disconnect();
 }
 
 

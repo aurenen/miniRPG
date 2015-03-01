@@ -1,6 +1,5 @@
 <?php
 require_once 'utils/functions.php';
-include_once 'header.php';
 
 if(isset($_POST['submit'])) {
   $login_user = cleanPOST($_POST['login_user']);
@@ -31,6 +30,8 @@ else { // set $url to page.php?QUERY
   else {
     $url = $_GET;
   }
+  
+include_once 'header.php';
 ?>
 
       <form class="form-horizontal" role="form" action="register.php" method="post">

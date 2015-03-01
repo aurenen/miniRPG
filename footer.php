@@ -2,7 +2,7 @@
       <div class="row">
         <div class="col-sm-4">
           <h2>Game Stats</h2>
-          <p>MiniRPG was created on March 10th, 2015. There are currently 25 registered players.</p>
+          <p><?php echo $site_title; ?> was created on March 10th, 2015. There are currently 25 registered players.</p>
           <p>The most popular class is Enchanter while the rarest class is Mystic.</p>
         </div>
         <div class="col-sm-4">
@@ -28,7 +28,7 @@
       <hr>
 
       <footer>
-        <p>&copy; MiniRPG 2015</p>
+        <p>&copy; <?php echo $site_title; ?> 2015</p>
       </footer>
     </div> <!-- /container -->
 
