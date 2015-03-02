@@ -68,6 +68,8 @@ function registerAccount($email, $pass, $chara, $gender) {
         exit();
     }
 
+    mysqli_report(MYSQLI_REPORT_ALL);
+    
     // check if email already registered
     $sql = "SELECT * FROM users WHERE email=?";
 
@@ -75,10 +77,10 @@ function registerAccount($email, $pass, $chara, $gender) {
     $stmt->bind_param('s', $email);
     $stmt->execute();
     if ($stmt->num_rows != 0) { 
-        $stmt->close();
         header('Location: register.php?error');
         exit();
     }
+    $stmt->close();
 
     // hash password before inserting into db
     $hasher = new PasswordHash(8, FALSE);
