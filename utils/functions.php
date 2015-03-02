@@ -73,7 +73,8 @@ function registerAccount($email, $pass, $chara, $gender) {
 
     $stmt = $db->prepare($sql);
     $stmt->bind_param('s', $email);
-    if ($stmt->execute()) { 
+    $stmt->execute();
+    if ($stmt->num_rows != 0) { 
         $stmt->close();
         header('Location: register.php?error');
         exit();
@@ -88,16 +89,15 @@ function registerAccount($email, $pass, $chara, $gender) {
 
     $one = 1;
     $zero = 0;
-    $null = NULL;
 
-    $sql = "INSERT INTO users (email, password, level, character_name, character_class, gender, stat_id, money, location)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO users (email, password, level, character_name, character_class, gender, money, location)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $db->prepare($sql);
 
     if (!$stmt) 
         fail('MySQL registration prepare', $db->error);
-    if (!$stmt->bind_param('ssisisiii', $email, $hash, $one, $chara, $zero, $gender, $null, $zero, $zero))
+    if (!$stmt->bind_param('ssisisii', $email, $hash, $one, $chara, $zero, $gender, $zero, $zero))
         fail('MySQL registration bind_param', $db->error);
     if (!$stmt->execute()) {
     /* Figure out why this failed - maybe the username is already taken?

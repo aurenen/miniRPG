@@ -9,17 +9,18 @@ if(isset($_POST['submit'])) {
   $login_gender = cleanPOST($_POST['login_gender']);
   $login_agree = cleanPOST($_POST['login_agree']);
 
-  if( !isset($login_user) || !isset($login_pass) || !isset($login_pass2) || !isset($login_chara) || !isset($login_gender) || !isset($login_agree) ) {
+  if( empty($login_user) || empty($login_pass) || empty($login_pass2) || empty($login_chara) || empty($login_gender) || empty($login_agree) ) {
     header('Location: register.php?required');
     exit();
   }
   
-  if( $login_pass != $login_pass2 ) {
+  elseif( $login_pass != $login_pass2 ) {
     header('Location: register.php?password');
     exit();
   }
   
-  registerAccount($login_user, $login_pass, $login_chara, $login_gender);
+  else
+    registerAccount($login_user, $login_pass, $login_chara, $login_gender);
 }
 
 else { // set $url to page.php?QUERY
@@ -69,7 +70,7 @@ include_once 'header.php';
               <div class="form-group<?php if ($url == "error" || $url== "invalid_email") echo " has-error"; ?>">
                 <label for="inputEmail" class="col-sm-3 control-label">Email</label>
                 <div class="col-sm-9">
-                  <input name="login_user" type="text" class="form-control" id="inputEmail" placeholder="Email">
+                  <input name="login_user" type="text" class="form-control" id="inputEmail" placeholder="Email" value="<?php echo isset($_POST['login_user']) ? $_POST['login_user'] : '' ?>">
                 </div>
               </div>
               <div class="form-group<?php if ($url == "password" || $url == "invalid_password") echo " has-error"; ?>">
