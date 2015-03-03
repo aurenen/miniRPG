@@ -155,13 +155,15 @@ function login($user, $pass) {
     $stmt = $db->prepare($sql);
     $stmt->bind_param('s', $user);
 
-    $result = $stmt->execute();
-    $stmt->close();
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $result->fetch_row();
 
-    if (!$result) { 
+    if ($result->num_rows === 0) { 
         header('Location: login.php?failed');
         exit();
     }
+    $stmt->close();
 
     // hash password before inserting into db
     $hasher = new PasswordHash(8, FALSE);

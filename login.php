@@ -7,7 +7,7 @@ if(isset($_POST['submit'])) {
   $login_user = cleanPOST($_POST['login_user']);
   $login_pass = cleanPOST($_POST['login_pass']);
 
-  if( !isset($login_user) || !isset($login_pass) ) {
+  if( empty($login_user) || empty($login_pass) ) {
     header('Location: login.php?error');
     exit();
   }
