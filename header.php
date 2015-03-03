@@ -29,6 +29,29 @@
           </button>
           <a class="navbar-brand" href="#"><?php echo $site_title; ?></a>
         </div>
+  <?php if ( isLogged() ): ?>
+
+        <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="active"><a href="index.php">Home <span class="sr-only">(current)</span></a></li>
+          <li><a href="#">Rankings</a></li>
+          <li><a href="#">Marketplace</a></li>
+          <li><a href="#">Battle Ground</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tabris <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="#">View Profile</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Settings</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Log Out</a></li>
+            </ul>
+          </li>
+        </ul>
+        </div><!--/.navbar-collapse -->
+
+  <?php else: ?>
+
         <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="index.php">Home</a></li>
@@ -37,6 +60,9 @@
 
         </ul>
         </div><!--/.navbar-collapse -->
+
+  <?php endif ?>
+
       </div>
     </nav>
 
