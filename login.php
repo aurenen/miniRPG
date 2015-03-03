@@ -3,6 +3,11 @@
 
 require_once "utils/functions.php";
 
+if( isLogged() ) {
+  header('Location: index.php');
+  exit();
+}
+
 if(isset($_POST['submit'])) {
   $login_user = cleanPOST($_POST['login_user']);
   $login_pass = cleanPOST($_POST['login_pass']);

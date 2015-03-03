@@ -5,7 +5,11 @@ session_regenerate_id(true);
 require_once 'config.php';
 require_once 'PasswordHash.php';
 
-$db; // global mysqli connection
+/*****************************************
+    Database Related Functions
+*****************************************/
+
+$db; // global mysqli connection object
 function db_connect() {
     global $db, $db_host, $db_user, $db_pass, $db_name;
     $db = new mysqli($db_host, $db_user, $db_pass, $db_name, 3306);
@@ -13,6 +17,11 @@ function db_connect() {
     if($db->connect_errno > 0) {
         die('Unable to connect to database [' . $db->connect_error . ']');
     }
+}
+
+function db_disconnect() {
+    global $db;
+    $db->close();
 }
 
 function fail($pub, $pvt = '') {
@@ -26,6 +35,10 @@ function fail($pub, $pvt = '') {
  * a "production install" to avoid leaking server setup details. */
     exit("An error occurred ($msg).\n");
 }
+
+/*****************************************
+    Misc Functions
+*****************************************/
 
 function get_post_var($var) {
     $val = $_POST[$var];
@@ -43,7 +56,7 @@ function cleanSQL($val) {
 }
 
 /*****************************************
-    User and Database Functions
+    User Account Functions
 *****************************************/
 
 function registerAccount($email, $pass, $chara, $gender) {
@@ -107,6 +120,9 @@ function registerAccount($email, $pass, $chara, $gender) {
      * definitely need to do that (or at least include code to do it) if we were
      * supporting multiple kinds of database backends, not just MySQL.  However,
      * the prepared statements interface we're using is MySQL-specific anyway. */
+        $stmt->close();
+        db_disconnect();
+
         if ($db->errno === 1062 /* ER_DUP_ENTRY */) {
             header('Location: register.php?error');
             exit();
@@ -123,11 +139,11 @@ function registerAccount($email, $pass, $chara, $gender) {
     //     die('Error: ' . $db->connect_error); 
     // }
     else {
+        $stmt->close();
+        db_disconnect();
         header('Location: login.php?regsuccess');
         exit();
     }
-
-    db_disconnect();
 }
 
 
@@ -187,38 +203,41 @@ function login($user, $pass) {
         fail('MySQL login fetch', $stmt->error);
 
     if ($hasher->CheckPassword($pass, $hash)) { // Redirect to home page after successful login.
-        // $_SESSION['active'] = true;
-        // $_SESSION['user_id'] = $result['u_id'];
+        $_SESSION['active'] = true;
+        $_SESSION['uid'] = $uid;
+        setcookie('uid', $_SESSION['uid']);
         // $_SESSION['user_name'] = $result['u_charactername'];
         // $_SESSION['user_email'] = $result['u_email'];
         // $_SESSION['user_class'] = $result['u_class'];
 
+        unset($hasher);
+        $stmt->close();
+        db_disconnect();
         // call a function to query for all user info based on $uid
 
         header('Location: index.php');
         exit();
     } 
     else { // Incorrect password. So, redirect to login_form again.
+        unset($hasher);
+        $stmt->close();
+        db_disconnect();
         header('Location: login.php?error');
         exit();
     }
-    unset($hasher);
-     
-    // $result = mysql_fetch_array($rs, MYSQL_ASSOC);
-    // $result = mysql_fetch_array($rs);
 
     //DEBUG
     //print_r($_SESSION);
 
         // setCookieInfo();
         // redirectHome();
-    
-    $stmt->close();
-    db_disconnect();
 }
 
+/*****************************************
+    Session Functions
+*****************************************/
 
-function db_disconnect() {
-    global $db;
-	$db->close();
+function isLogged() {
+    if (isset($_SESSION['active']) && $_SESSION['active']===true) return true; 
+    else return false;
 }
