@@ -42,6 +42,10 @@ include_once "header.php";
             <td><?php echo "Enchanter" ?></td>
           </tr>
           <tr>
+            <th>Level</th>
+            <td><?php echo $profile['level'] ?></td>
+          </tr>
+          <tr>
             <th>Money</th>
             <td><?php echo $profile['money'] ?></td>
           </tr>

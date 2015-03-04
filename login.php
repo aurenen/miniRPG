@@ -32,11 +32,11 @@ else { // set $url to page.php?QUERY
 include_once "header.php";
 ?>
 
+      <h2>Account Login</h2>
       <form class="form-horizontal" role="form" action="login.php" method="post">
         <fieldset>
           <div class="row">
             <div class="col-sm-6 col-md-offset-3">
-              <h2>Login</h2>
 
               <?php if ($url == "failed") { ?>
               <div class="alert alert-danger" role="alert">No such account.</div>

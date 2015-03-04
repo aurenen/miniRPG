@@ -43,9 +43,9 @@ else { // set $url to page.php?QUERY
 include_once 'header.php';
 ?>
 
+      <h2>Register for an Account</h2>
       <form class="form-horizontal" role="form" action="register.php" method="post">
         <fieldset>
-          <h2>Register for an account</h2>
             <?php if ($url == "error") { ?>
             <div class="alert alert-danger" role="alert">Email already registered.</div>
 
