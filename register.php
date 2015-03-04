@@ -14,6 +14,9 @@ if(isset($_POST['submit'])) {
   $login_gender = cleanPOST($_POST['login_gender']);
   $login_agree = cleanPOST($_POST['login_agree']);
 
+  $_SESSION['login_user'] = $login_user;
+  $_SESSION['login_chara'] = $login_chara;
+
   if( empty($login_user) || empty($login_pass) || empty($login_pass2) || empty($login_chara) || empty($login_gender) || empty($login_agree) ) {
     header('Location: register.php?required');
     exit();
@@ -75,7 +78,7 @@ include_once 'header.php';
               <div class="form-group<?php if ($url == "error" || $url== "invalid_email") echo " has-error"; ?>">
                 <label for="inputEmail" class="col-sm-3 control-label">Email</label>
                 <div class="col-sm-9">
-                  <input name="login_user" type="text" class="form-control" id="inputEmail" placeholder="Email" value="<?php echo isset($_POST['login_user']) ? $_POST['login_user'] : '' ?>">
+                  <input name="login_user" type="text" class="form-control" id="inputEmail" placeholder="Email" value="<?php echo isset($_SESSION['login_user']) ? $_SESSION['login_user'] : '' ?>">
                 </div>
               </div>
               <div class="form-group<?php if ($url == "password" || $url == "invalid_password") echo " has-error"; ?>">
@@ -92,7 +95,7 @@ include_once 'header.php';
               <div class="form-group">
                 <label for="characterName" class="col-sm-3 control-label">Character Name</label>
                 <div class="col-sm-9">
-                  <input name="login_chara" type="text" class="form-control" id="characterName" placeholder="Character Name">
+                  <input name="login_chara" type="text" class="form-control" id="characterName" placeholder="Character Name" value="<?php echo isset($_SESSION['login_chara']) ? $_SESSION['login_chara'] : '' ?>">
                 </div>
               </div>
               <div class="form-group">
