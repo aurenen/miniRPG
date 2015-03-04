@@ -1,7 +1,12 @@
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
   padding-top: 50px;
-  padding-bottom: 20px;
+  padding-bottom: 0px;
+}
+
+#footer {
+	background: #eee url('../images/footer.png') repeat 50% 0%;
+	margin: 25px auto 0 auto;
 }
 
 /* responsive header image */
