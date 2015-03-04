@@ -66,15 +66,7 @@
       </div>
     </nav>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>Temp placement for header</p>
-        <p>&nbsp;</p>
-      </div>
-    </div>
+    <div id="headimg"></div>
 
     <div class="container">
 
