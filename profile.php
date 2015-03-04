@@ -10,22 +10,22 @@ include_once "header.php";
       <div class="media">
         <h1><?php echo $profile["character_name"]; ?> <small><?php echo "Enchanter" ?></small></h1>
         <p class="lead">
-          <abbr title="Strength / Attack">STR</abbr> : <?php echo $profile["str"] ?> / 
-          <abbr title="Vitality / Mana">VIT</abbr> : <?php echo $profile["vit"] ?> / 
-          <abbr title="Agility / Evasion">AGI</abbr> : <?php echo $profile["agi"] ?>  / 
-          <abbr title="Wisdom / Mana">WIS</abbr> : <?php echo $profile["wis"] ?> / 
-          <abbr title="Dexterity / Evasion">DEX</abbr> : <?php echo $profile["dex"] ?>  / 
-          <abbr title="Cunning / Mana">CUN</abbr> : <?php echo $profile["cun"] ?>
+          <abbr title="Strength">STR</abbr> : <?php echo $profile["str"] ?> / 
+          <abbr title="Vitality">VIT</abbr> : <?php echo $profile["vit"] ?> / 
+          <abbr title="Agility">AGI</abbr> : <?php echo $profile["agi"] ?>  / 
+          <abbr title="Wisdom">WIS</abbr> : <?php echo $profile["wis"] ?> / 
+          <abbr title="Dexterity">DEX</abbr> : <?php echo $profile["dex"] ?>  / 
+          <abbr title="Cunning">CUN</abbr> : <?php echo $profile["cun"] ?>
 
 
         </p>
       </div>
 
-      <table class="table">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th></th>
-            <th width="75%">Current</th>
+            <th width="75%"></th>
           </tr>
         </thead>
         <tbody>
@@ -48,13 +48,12 @@ include_once "header.php";
           <tr>
             <th>Stats</th>
             <td>
-              
-	          <abbr title="Strength / Attack">STR</abbr> : <?php echo $profile["str"] ?> / 
-	          <abbr title="Vitality / Mana">VIT</abbr> : <?php echo $profile["vit"] ?> / 
-	          <abbr title="Agility / Evasion">AGI</abbr> : <?php echo $profile["agi"] ?>  / 
-	          <abbr title="Wisdom / Mana">WIS</abbr> : <?php echo $profile["wis"] ?> / 
-	          <abbr title="Dexterity / Evasion">DEX</abbr> : <?php echo $profile["dex"] ?>  / 
-	          <abbr title="Cunning / Mana">CUN</abbr> : <?php echo $profile["cun"] ?>
+              <abbr title="Strength">STR</abbr> : <?php echo $profile["str"] ?> / 
+              <abbr title="Vitality">VIT</abbr> : <?php echo $profile["vit"] ?> / 
+              <abbr title="Agility">AGI</abbr> : <?php echo $profile["agi"] ?>  / 
+              <abbr title="Wisdom">WIS</abbr> : <?php echo $profile["wis"] ?> / 
+              <abbr title="Dexterity">DEX</abbr> : <?php echo $profile["dex"] ?>  / 
+              <abbr title="Cunning">CUN</abbr> : <?php echo $profile["cun"] ?>
 
               <hr class="clear">
               Your stat points are out of a total of 100, divided into 6 categories based on your class.
