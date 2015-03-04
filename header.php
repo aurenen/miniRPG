@@ -27,24 +27,24 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#"><?php echo $site_title; ?></a>
+          <a class="navbar-brand" href="index.php"><?php echo $site_title; ?></a>
         </div>
   <?php if ( isLogged() ): ?>
 
         <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
-          <li class="active"><a href="index.php">Home <span class="sr-only">(current)</span></a></li>
+          <li><a href="index.php">Home</a></li>
           <li><a href="#">Rankings</a></li>
           <li><a href="#">Marketplace</a></li>
           <li><a href="#">Battle Ground</a></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tabris <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><?php echo $profile["character_name"]; ?> <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="#">View Profile</a></li>
+              <li><a href="profile.php">View Profile</a></li>
               <li class="divider"></li>
               <li><a href="#">Settings</a></li>
               <li class="divider"></li>
-              <li><a href="#">Log Out</a></li>
+              <li><a href="logout.php">Log Out</a></li>
             </ul>
           </li>
         </ul>
@@ -56,7 +56,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li><a href="index.php">Home</a></li>
           <li><a href="login.php">Login</a></li>
-          <li class="active"><a href="register.php">Register <span class="sr-only">(current)</span></a></li>
+          <li><a href="register.php">Register</a></li>
 
         </ul>
         </div><!--/.navbar-collapse -->

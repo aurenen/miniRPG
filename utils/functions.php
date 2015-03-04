@@ -10,6 +10,7 @@ require_once 'PasswordHash.php';
 *****************************************/
 
 $db; // global mysqli connection object
+$profile = array(); // global profile array
 function db_connect() {
     global $db, $db_host, $db_user, $db_pass, $db_name;
     $db = new mysqli($db_host, $db_user, $db_pass, $db_name, 3306);
@@ -81,7 +82,7 @@ function registerAccount($email, $pass, $chara, $gender) {
         exit();
     }
 
-    mysqli_report(MYSQLI_REPORT_ALL);
+    // mysqli_report(MYSQLI_REPORT_ALL);
     
     // check if email already registered
     $sql = "SELECT * FROM users WHERE email=?";
@@ -148,7 +149,7 @@ function registerAccount($email, $pass, $chara, $gender) {
 
 
 function login($user, $pass) {
-    global $db;
+    global $db, $profile;
     db_connect();
 
     $user = cleanSQL($user);
@@ -186,7 +187,7 @@ function login($user, $pass) {
 
     $sql = "SELECT password, uid FROM users WHERE email=?";
 
-    mysqli_report(MYSQLI_REPORT_ALL);
+    // mysqli_report(MYSQLI_REPORT_ALL);
 
     $hash = '*'; // In case the user is not found
 
@@ -212,10 +213,12 @@ function login($user, $pass) {
 
         unset($hasher);
         $stmt->close();
-        db_disconnect();
+        header('Location: index.php');
         // call a function to query for all user info based on $uid
 
-        header('Location: index.php');
+        db_disconnect();
+
+
         exit();
     } 
     else { // Incorrect password. So, redirect to login_form again.
@@ -231,6 +234,43 @@ function login($user, $pass) {
 
         // setCookieInfo();
         // redirectHome();
+}
+
+function getProfile($uid) {
+    global $db;
+    db_connect();
+
+    // check if uid exists
+    $sql = "SELECT * FROM users WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param('i', $uid);
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $result->fetch_row();
+
+    if ($result->num_rows === 0) { 
+        header('Location: profile.php?uid=failed');
+        exit();
+    }
+    $stmt->close();
+
+    $sql = "SELECT * FROM users, stats WHERE id=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getProfile prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getProfile bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getProfile execute', $stmt->error);
+
+    $result = $stmt->get_result();
+    $row = $result->fetch_array(MYSQLI_ASSOC);
+    // db_disconnect();
+    return $row;
 }
 
 /*****************************************

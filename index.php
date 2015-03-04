@@ -1,15 +1,18 @@
 <?php
 require_once "utils/functions.php";
-include_once "header.php";
-
 if( isLogged() ) {
+  $profile = getProfile($_SESSION['uid']);
+include "header.php";
+
 ?>
 
-<p>Logged in</p>
+<h1>Welcome!</h1>
+<p>Successful logged in.</p>
 
-<?php } else { ?>
+<?php } else { 
+include "header.php"; ?>
 
-      
-<p>Logged out</p>
+<h1>Welcome!</h1>
+<p>Logged out, please log in or register for an account.</p>
 
 <?php } include_once "footer.php"; ?>
