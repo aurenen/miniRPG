@@ -7,7 +7,6 @@ if( isLogged() ) {
 include_once "header.php";
 ?>
 
-    <div class="container">
       <div class="media">
         <h1><?php echo $profile["character_name"]; ?> <small><?php echo "Enchanter" ?></small></h1>
         <p class="lead">
