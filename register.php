@@ -84,18 +84,18 @@ include_once 'header.php';
               <div class="form-group<?php if ($url == "password" || $url == "invalid_password") echo " has-error"; ?>">
                 <label for="inputPassword" class="col-sm-3 control-label">Password</label>
                 <div class="col-sm-9">
-                  <input name="login_pass" type="password" class="form-control" id="inputPassword" placeholder="Password">
+                  <input name="login_pass" type="password" class="form-control" id="inputPassword" placeholder="Password" pattern=".{8,}" required title="8 characters minimum">
                 </div>
               </div>
               <div class="form-group<?php if ($url == "password" || $url == "invalid_password") echo " has-error"; ?>">
                 <div class="col-sm-9 col-sm-offset-3">
-                  <input name="login_pass2" type="password" class="form-control" id="inputPassword" placeholder="Password again">
+                  <input name="login_pass2" type="password" class="form-control" id="inputPassword" placeholder="Password again" pattern=".{8,}" required title="8 characters minimum">
                 </div>
               </div>
               <div class="form-group">
                 <label for="characterName" class="col-sm-3 control-label">Character Name</label>
                 <div class="col-sm-9">
-                  <input name="login_chara" type="text" class="form-control" id="characterName" placeholder="Character Name" value="<?php echo isset($_SESSION['login_chara']) ? $_SESSION['login_chara'] : '' ?>">
+                  <input name="login_chara" type="text" class="form-control" id="characterName" placeholder="Character Name" value="<?php echo isset($_SESSION['login_chara']) ? $_SESSION['login_chara'] : '' ?>"  pattern=".{3,}" required title="3 characters minimum">
                 </div>
               </div>
               <div class="form-group">
