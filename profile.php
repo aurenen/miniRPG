@@ -2,7 +2,8 @@
 require_once "utils/functions.php";
 
 if( isLogged() ) {
-	$profile = getProfile($_SESSION['uid']);
+  $profile = getProfile($_SESSION['uid']);
+  $stats = getStats($_SESSION['uid']);
 
 include_once "header.php";
 ?>
@@ -10,12 +11,12 @@ include_once "header.php";
       <div class="media">
         <h1><?php echo $profile["character_name"]; ?> <small><?php echo "Enchanter" ?></small></h1>
         <p class="lead">
-          <abbr title="Strength">STR</abbr> : <?php echo $profile["str"] ?> / 
-          <abbr title="Vitality">VIT</abbr> : <?php echo $profile["vit"] ?> / 
-          <abbr title="Agility">AGI</abbr> : <?php echo $profile["agi"] ?>  / 
-          <abbr title="Wisdom">WIS</abbr> : <?php echo $profile["wis"] ?> / 
-          <abbr title="Dexterity">DEX</abbr> : <?php echo $profile["dex"] ?>  / 
-          <abbr title="Cunning">CUN</abbr> : <?php echo $profile["cun"] ?>
+          <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 
+          <abbr title="Vitality">VIT</abbr> : <?php echo $stats["vit"] ?> / 
+          <abbr title="Agility">AGI</abbr> : <?php echo $stats["agi"] ?>  / 
+          <abbr title="Wisdom">WIS</abbr> : <?php echo $stats["wis"] ?> / 
+          <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?>  / 
+          <abbr title="Cunning">CUN</abbr> : <?php echo $stats["cun"] ?>
 
 
         </p>
@@ -52,12 +53,12 @@ include_once "header.php";
           <tr>
             <th>Stats</th>
             <td>
-              <abbr title="Strength">STR</abbr> : <?php echo $profile["str"] ?> / 
-              <abbr title="Vitality">VIT</abbr> : <?php echo $profile["vit"] ?> / 
-              <abbr title="Agility">AGI</abbr> : <?php echo $profile["agi"] ?>  / 
-              <abbr title="Wisdom">WIS</abbr> : <?php echo $profile["wis"] ?> / 
-              <abbr title="Dexterity">DEX</abbr> : <?php echo $profile["dex"] ?>  / 
-              <abbr title="Cunning">CUN</abbr> : <?php echo $profile["cun"] ?>
+              <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 
+              <abbr title="Vitality">VIT</abbr> : <?php echo $stats["vit"] ?> / 
+              <abbr title="Agility">AGI</abbr> : <?php echo $stats["agi"] ?>  / 
+              <abbr title="Wisdom">WIS</abbr> : <?php echo $stats["wis"] ?> / 
+              <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?>  / 
+              <abbr title="Cunning">CUN</abbr> : <?php echo $stats["cun"] ?>
 
               <hr class="clear">
               Your stat points are out of a total of 100, divided into 6 categories based on your class.

@@ -236,27 +236,43 @@ function login($user, $pass) {
         // redirectHome();
 }
 
+function bind_result_array($stmt) {
+    $meta = $stmt->result_metadata();
+    $result = array();
+    while ($field = $meta->fetch_field()) {
+        $result[$field->name] = NULL;
+        $params[] = &$result[$field->name];
+    }
+ 
+    call_user_func_array(array($stmt, 'bind_result'), $params);
+    return $result;
+}
+
+function getCopy($row) {
+    return array_map(create_function('$a', 'return $a;'), $row);
+}
+
 function getProfile($uid) {
     global $db;
     db_connect();
 
     // check if uid exists
+    // $sql = "SELECT * FROM users WHERE uid=?";
+
+    // $stmt = $db->prepare($sql);
+    // $stmt->bind_param('i', $uid);
+
+    // $stmt->execute();
+    // $result = $stmt->get_result();
+    // $result->fetch_row();
+
+    // if ($result->num_rows === 0) { 
+    //     header('Location: profile.php?uid=failed');
+    //     exit();
+    // }
+    // $stmt->close();
+
     $sql = "SELECT * FROM users WHERE uid=?";
-
-    $stmt = $db->prepare($sql);
-    $stmt->bind_param('i', $uid);
-
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $result->fetch_row();
-
-    if ($result->num_rows === 0) { 
-        header('Location: profile.php?uid=failed');
-        exit();
-    }
-    $stmt->close();
-
-    $sql = "SELECT * FROM users, stats WHERE id=?";
 
     $stmt = $db->prepare($sql);
 
@@ -268,8 +284,33 @@ function getProfile($uid) {
         fail('MySQL getProfile execute', $stmt->error);
 
     $result = $stmt->get_result();
-    $row = $result->fetch_array(MYSQLI_ASSOC);
-    // db_disconnect();
+    // $row = $result->fetch_array(MYSQLI_ASSOC);
+    $row = $result->fetch_assoc();
+    $result->free();
+    db_disconnect();
+    return $row;
+}
+
+function getStats($uid) {
+    global $db;
+    db_connect();
+
+    $sql = "SELECT exp, hp, sp, str, vit, dex, agi, cun, wis FROM users, stats WHERE id=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getStats prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getStats bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getStats execute', $stmt->error);
+
+    $result = $stmt->get_result();
+    // $row = $result->fetch_array(MYSQLI_ASSOC);
+    $row = $result->fetch_assoc();
+    $result->free();
+    db_disconnect();
     return $row;
 }
 
