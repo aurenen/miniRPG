@@ -29,10 +29,10 @@
         </div>
       </div>
 
-      <hr>
+      <hr class="bold">
 
       <footer>
-        <p>&copy; <?php echo $site_title; ?> 2015</p>
+        <p class="text-center">&copy; <?php echo $site_title; ?> 2015</p>
       </footer>
     </div> <!-- /container -->
     </div> <!-- /#footer -->

@@ -7,6 +7,11 @@ body {
 #footer {
 	background: #eee url('../images/footer.png') repeat 50% 0%;
 	margin: 25px auto 0 auto;
+    padding: 5px 0 20px 0;
+}
+
+hr.bold {
+    border-top: 2px solid #d5e5df;
 }
 
 /* responsive header image */
