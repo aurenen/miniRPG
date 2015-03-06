@@ -213,12 +213,9 @@ function login($user, $pass) {
 
         unset($hasher);
         $stmt->close();
+        db_disconnect();
         header('Location: index.php');
         // call a function to query for all user info based on $uid
-
-        db_disconnect();
-
-
         exit();
     } 
     else { // Incorrect password. So, redirect to login_form again.
@@ -236,20 +233,49 @@ function login($user, $pass) {
         // redirectHome();
 }
 
-function bind_result_array($stmt) {
-    $meta = $stmt->result_metadata();
-    $result = array();
-    while ($field = $meta->fetch_field()) {
-        $result[$field->name] = NULL;
-        $params[] = &$result[$field->name];
-    }
- 
-    call_user_func_array(array($stmt, 'bind_result'), $params);
-    return $result;
-}
+function getCharacterName($uid) {
+    global $db;
+    db_connect();
 
-function getCopy($row) {
-    return array_map(create_function('$a', 'return $a;'), $row);
+    // check if uid exists
+    // $sql = "SELECT * FROM users WHERE uid=?";
+
+    // $stmt = $db->prepare($sql);
+    // $stmt->bind_param('i', $uid);
+
+    // $stmt->execute();
+    // $result = $stmt->get_result();
+    // $result->fetch_row();
+
+    // if ($result->num_rows === 0) { 
+    //     header('Location: profile.php?uid=failed');
+    //     exit();
+    // }
+    // $stmt->close();
+
+    $sql = "SELECT character_name FROM users WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getCharacterName prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getCharacterName bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getCharacterName execute', $stmt->error);
+    if (!$stmt->bind_result($name))
+        fail('MySQL getCharacterName bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL getCharacterName fetch', $stmt->error);
+
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) { 
+        db_disconnect();
+        header('Location: login.php?failed');
+        exit();
+    }
+    db_disconnect();
+    return $name;
 }
 
 function getProfile($uid) {
@@ -312,6 +338,11 @@ function getStats($uid) {
     $result->free();
     db_disconnect();
     return $row;
+}
+
+function isNew($uid) {
+    // if new = true, make them select a class
+    // else they can't select class
 }
 
 /*****************************************

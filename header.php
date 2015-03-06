@@ -18,6 +18,7 @@
   </head>
   <body>
 
+
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -30,15 +31,16 @@
           <a class="navbar-brand" href="index.php"><?php echo $site_title; ?></a>
         </div>
   <?php if ( isLogged() ): ?>
+  <?php $chara_name = getCharacterName($_SESSION['uid']); ?>
 
         <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="index.php">Home</a></li>
           <li><a href="#">Rankings</a></li>
           <li><a href="#">Marketplace</a></li>
-          <li><a href="#">Battle Ground</a></li>
+          <li><a href="#">Battleground</a></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><?php echo $profile["character_name"]; ?> <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><?php echo $chara_name; ?> <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
               <li><a href="profile.php">View Profile</a></li>
               <li class="divider"></li>
