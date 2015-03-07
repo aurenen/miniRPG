@@ -14,6 +14,24 @@ hr.bold {
     border-top: 2px solid #d5e5df;
 }
 
+div.jumbotron.first {
+    margin: 25px 0 0 0;
+}
+
+.itembox {
+    background-color: #eee;
+    margin: 15px 0;
+    padding: 20px;
+    border-radius: 6px;
+    text-align: center;
+}
+.itembox h3 {
+    margin: 0px auto 10px auto;
+}
+.itembox .btn {
+    margin: 10px auto 0 auto;
+}
+
 .profile-avatar {
     text-align: center;
     padding: 20px 0 0 0;

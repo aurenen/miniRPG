@@ -24,7 +24,7 @@ include_once "header.php";
   <div class="row">
     <div class="col-sm-4">
       <div class="profile-avatar">
-        <img class="center-block" src="http://placehold.it/200x300" alt="Avatar">
+        <img class="center-block" src="http://placehold.it/200x300" alt="Avatar" />
       </div>
     </div>
     <div class="col-sm-8">
