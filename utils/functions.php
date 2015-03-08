@@ -343,7 +343,7 @@ function getStats($uid) {
 function isNew($uid) {
     // if new = true, make them select a class
     // else they can't select class
-    return true;
+    return false;
 }
 
 /*****************************************
