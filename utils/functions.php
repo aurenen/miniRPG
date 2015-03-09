@@ -370,6 +370,42 @@ function isNew($uid) {
     return $flag;
 }
 
+function setClass($uid, $type) {
+    global $db;
+    db_connect();
+
+    $sql = "UPDATE users SET character_class=?, new=? WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+
+    $new = 0;
+
+    if (!$stmt) 
+        fail('MySQL setClass prepare', $db->error);
+    if (!$stmt->bind_param('iii', $type, $new, $uid))
+        fail('MySQL setClass bind_param', $db->error);
+    if (!$stmt->execute()) {
+    /* Figure out why this failed - maybe the username is already taken?
+     * It could be more reliable/portable to issue a SELECT query here.  We would
+     * definitely need to do that (or at least include code to do it) if we were
+     * supporting multiple kinds of database backends, not just MySQL.  However,
+     * the prepared statements interface we're using is MySQL-specific anyway. */
+        $stmt->close();
+
+        fail('MySQL registration execute', $db->error);
+        db_disconnect();
+
+        header('Location: selectclass.php?error');
+        exit();
+    }
+    else {
+        $stmt->close();
+        db_disconnect();
+        header('Location: profile.php?setclass');
+        exit();
+    }
+}
+
 /*****************************************
     Session Functions
 *****************************************/

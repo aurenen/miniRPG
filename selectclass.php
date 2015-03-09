@@ -1,10 +1,18 @@
 <?php
 require_once "utils/functions.php";
-include_once "header.php";
 
 if( isLogged() && isNew($_SESSION['uid']) ) {
   $profile = getProfile($_SESSION['uid']);
   $stats = getStats($_SESSION['uid']);
+
+  if(isset($_POST['class_warrior'])) {
+    setClass($_SESSION['uid'], 1);
+  }
+  elseif(isset($_POST['class_enchanter'])) {
+    setClass($_SESSION['uid'], 2);
+  }
+
+include_once "header.php";
 
 ?>
 
