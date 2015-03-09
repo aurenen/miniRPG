@@ -84,12 +84,12 @@ include_once 'header.php';
               <div class="form-group<?php if ($url == "password" || $url == "invalid_password") echo " has-error"; ?>">
                 <label for="inputPassword" class="col-sm-3 control-label">Password</label>
                 <div class="col-sm-9">
-                  <input name="login_pass" type="password" class="form-control" id="inputPassword" placeholder="Password" pattern=".{8,}" required title="8 characters minimum">
+                  <input name="login_pass" type="password" class="form-control" id="inputPassword" placeholder="Password" pattern=".{4,}" required title="8 characters minimum">
                 </div>
               </div>
               <div class="form-group<?php if ($url == "password" || $url == "invalid_password") echo " has-error"; ?>">
                 <div class="col-sm-9 col-sm-offset-3">
-                  <input name="login_pass2" type="password" class="form-control" id="inputPassword" placeholder="Password again" pattern=".{8,}" required title="8 characters minimum">
+                  <input name="login_pass2" type="password" class="form-control" id="inputPassword" placeholder="Password again" pattern=".{4,}" required title="8 characters minimum">
                 </div>
               </div>
               <div class="form-group">
