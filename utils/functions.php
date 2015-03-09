@@ -106,14 +106,14 @@ function registerAccount($email, $pass, $chara, $gender) {
     $one = 1;
     $zero = 0;
 
-    $sql = "INSERT INTO users (email, password, level, character_name, character_class, gender, money, location)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO users (email, password, level, character_name, character_class, gender, money, location, new)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $db->prepare($sql);
 
     if (!$stmt) 
         fail('MySQL registration prepare', $db->error);
-    if (!$stmt->bind_param('ssisisii', $email, $hash, $one, $chara, $zero, $gender, $zero, $zero))
+    if (!$stmt->bind_param('ssisisiii', $email, $hash, $one, $chara, $zero, $gender, $zero, $zero, $one))
         fail('MySQL registration bind_param', $db->error);
     if (!$stmt->execute()) {
     /* Figure out why this failed - maybe the username is already taken?
@@ -341,9 +341,33 @@ function getStats($uid) {
 }
 
 function isNew($uid) {
+    global $db;
+    db_connect();
     // if new = true, make them select a class
     // else they can't select class
-    return false;
+    $sql = "SELECT new FROM users WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL isNew prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL isNew bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL isNew execute', $stmt->error);
+    if (!$stmt->bind_result($flag))
+        fail('MySQL isNew bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL isNew fetch', $stmt->error);
+
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) { 
+        db_disconnect();
+        header('Location: login.php?failed');
+        exit();
+    }
+    db_disconnect();
+    return $flag;
 }
 
 /*****************************************
