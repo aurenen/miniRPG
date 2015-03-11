@@ -11,6 +11,18 @@ if( isLogged() && isNew($_SESSION['uid']) ) {
   elseif(isset($_POST['class_enchanter'])) {
     setClass($_SESSION['uid'], 2);
   }
+  elseif(isset($_POST['class_ranger'])) {
+    setClass($_SESSION['uid'], 3);
+  }
+  elseif(isset($_POST['class_templar'])) {
+    setClass($_SESSION['uid'], 4);
+  }
+  elseif(isset($_POST['class_mystic'])) {
+    setClass($_SESSION['uid'], 5);
+  }
+  elseif(isset($_POST['class_ranger'])) {
+    setClass($_SESSION['uid'], 6);
+  }
 
 include_once "header.php";
 

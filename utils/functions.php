@@ -406,6 +406,36 @@ function setClass($uid, $type) {
     }
 }
 
+function getClass($uid) {
+    global $db;
+    db_connect();
+
+    $sql = "SELECT classes.type FROM classes LEFT JOIN users ON classes.cid = users.character_class WHERE users.uid = ?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getStats prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getStats bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getStats execute', $stmt->error);
+    if (!$stmt->bind_result($class_name))
+        fail('MySQL getCharacterName bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL getCharacterName fetch', $stmt->error);
+
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) { 
+        db_disconnect();
+        header('Location: login.php?failed');
+        exit();
+    }
+    db_disconnect();
+    return $class_name;
+}
+
+
 /*****************************************
     Session Functions
 *****************************************/

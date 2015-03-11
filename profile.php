@@ -1,15 +1,25 @@
 <?php
 require_once "utils/functions.php";
 
-if( isLogged() ) {
+if( isLogged() && !isNew($_SESSION['uid']) ) {
   $profile = getProfile($_SESSION['uid']);
   $stats = getStats($_SESSION['uid']);
+  $chara_class = getClass($_SESSION['uid']);
+
+  // set $url to page.php?QUERY
+  if (isset($_SERVER['QUERY_STRING'])) {
+    $url = $_SERVER['QUERY_STRING'];
+    parse_str($url, $vars);
+  } 
+  else {
+    $url = $_GET;
+  }
 
 include_once "header.php";
 ?>
 
       <div class="media">
-        <h1><?php echo $profile["character_name"]; ?> <small><?php echo "Enchanter" ?></small></h1>
+        <h1><?php echo $profile["character_name"]; ?> <small><?php echo $chara_class ?></small></h1>
         <p class="lead">
           <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 
           <abbr title="Vitality">VIT</abbr> : <?php echo $stats["vit"] ?> / 
@@ -22,6 +32,12 @@ include_once "header.php";
 
 <div class="container-fluid">
   <div class="row">
+  <?php if ($url == "setclass") { ?>
+  <div class="alert alert-info" role="alert">You have successfully selected your character's class.</div>
+
+  <?php } if ($url == "updated") { ?>
+  <div class="alert alert-info" role="alert">You have successfully updated your profile.</div>
+  <?php } ?>
     <div class="col-sm-4">
       <div class="profile-avatar">
         <img class="center-block" src="http://placehold.it/200x300" alt="Avatar" />
@@ -46,7 +62,7 @@ include_once "header.php";
             </tr>
             <tr>
               <th>Class</th>
-              <td><?php echo "Enchanter" ?></td>
+              <td><?php echo $chara_class ?></td>
             </tr>
             <tr>
               <th>Level</th>
