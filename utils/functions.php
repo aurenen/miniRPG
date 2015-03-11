@@ -370,6 +370,54 @@ function isNew($uid) {
     return $flag;
 }
 
+function setStats($uid, $type) {
+    define("WAR", 1);
+    define("ENC", 2);
+    define("RAN", 3);
+    define("TEM", 4);
+    define("MYS", 5);
+    define("ROG", 6);
+
+    $hp; $sp; $str; $vit; $dex; $agi; $cun; $wis; $exp = 0;
+    // stats start out from a total of 30 points (avg of 5 pts * 6 areas)
+    switch ($type) {
+        case WAR:
+            $hp = 50;
+            $sp = 15;
+            $str = 10;
+            $vit = 5;
+            $dex = 5;
+            $agi = 3;
+            $cun = 5;
+            $wis = 2;
+            break;
+        
+        case ENC:
+            # code...
+            break;
+        
+        case RAN:
+            # code...
+            break;
+        
+        case TEM:
+            # code...
+            break;
+        
+        case MYS:
+            # code...
+            break;
+        
+        case ROG:
+            # code...
+            break;
+        
+        default:
+            # code...
+            break;
+    }
+}
+
 function setClass($uid, $type) {
     global $db;
     db_connect();
@@ -392,7 +440,7 @@ function setClass($uid, $type) {
      * the prepared statements interface we're using is MySQL-specific anyway. */
         $stmt->close();
 
-        fail('MySQL registration execute', $db->error);
+        fail('MySQL setClass execute', $db->error);
         db_disconnect();
 
         header('Location: selectclass.php?error');
@@ -400,6 +448,8 @@ function setClass($uid, $type) {
     }
     else {
         $stmt->close();
+        // call set stats function
+        // setStats($uid, $type);
         db_disconnect();
         header('Location: profile.php?setclass');
         exit();
@@ -415,15 +465,15 @@ function getClass($uid) {
     $stmt = $db->prepare($sql);
 
     if (!$stmt) 
-        fail('MySQL getStats prepare', $stmt->error);
+        fail('MySQL getClass prepare', $stmt->error);
     if (!$stmt->bind_param('i', $uid))
-        fail('MySQL getStats bind_param', $stmt->error);
+        fail('MySQL getClass bind_param', $stmt->error);
     if (!$stmt->execute())
-        fail('MySQL getStats execute', $stmt->error);
+        fail('MySQL getClass execute', $stmt->error);
     if (!$stmt->bind_result($class_name))
-        fail('MySQL getCharacterName bind_result', $stmt->error);
+        fail('MySQL getClass bind_result', $stmt->error);
     if (!$stmt->fetch() && $stmt->errno)
-        fail('MySQL getCharacterName fetch', $stmt->error);
+        fail('MySQL getClass fetch', $stmt->error);
 
     $result = $stmt->get_result();
     if ($result->num_rows === 0) { 
