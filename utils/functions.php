@@ -382,34 +382,69 @@ function setStats($uid, $type) {
     // stats start out from a total of 30 points (avg of 5 pts * 6 areas)
     switch ($type) {
         case WAR:
-            $hp = 50;
+            $hp = 45;
             $sp = 15;
-            $str = 10;
-            $vit = 5;
+            $str = 9;
+            $vit = 8;
             $dex = 5;
             $agi = 3;
-            $cun = 5;
+            $cun = 3;
             $wis = 2;
             break;
         
         case ENC:
-            # code...
+            $hp = 25;
+            $sp = 55;
+            $str = 1;
+            $vit = 2;
+            $dex = 9;
+            $agi = 2;
+            $cun = 6;
+            $wis = 10;
             break;
         
         case RAN:
-            # code...
+            $hp = 35;
+            $sp = 25;
+            $str = 2;
+            $vit = 4;
+            $dex = 10;
+            $agi = 8;
+            $cun = 4;
+            $wis = 2;
             break;
         
         case TEM:
-            # code...
+            $hp = 55;
+            $sp = 30;
+            $str = 7;
+            $vit = 9;
+            $dex = 4;
+            $agi = 2;
+            $cun = 2;
+            $wis = 6;
             break;
         
         case MYS:
-            # code...
+            $hp = 50;
+            $sp = 50;
+            $str = 1;
+            $vit = 10;
+            $dex = 6;
+            $agi = 2;
+            $cun = 2;
+            $wis = 9;
             break;
         
         case ROG:
-            # code...
+            $hp = 30;
+            $sp = 25;
+            $str = 2;
+            $vit = 3;
+            $dex = 5;
+            $agi = 10;
+            $cun = 8;
+            $wis = 2;
             break;
         
         default:
