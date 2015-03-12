@@ -23,10 +23,10 @@ include_once "header.php";
         <p class="lead">
           <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 
           <abbr title="Vitality">VIT</abbr> : <?php echo $stats["vit"] ?> / 
+          <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?> / 
           <abbr title="Agility">AGI</abbr> : <?php echo $stats["agi"] ?>  / 
-          <abbr title="Wisdom">WIS</abbr> : <?php echo $stats["wis"] ?> / 
-          <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?>  / 
-          <abbr title="Cunning">CUN</abbr> : <?php echo $stats["cun"] ?>
+          <abbr title="Cunning">CUN</abbr> : <?php echo $stats["cun"] ?> / 
+          <abbr title="Wisdom">WIS</abbr> : <?php echo $stats["wis"] ?>
         </p>
       </div>
 
@@ -77,10 +77,10 @@ include_once "header.php";
               <td>
                 <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 
                 <abbr title="Vitality">VIT</abbr> : <?php echo $stats["vit"] ?> / 
+                <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?> / 
                 <abbr title="Agility">AGI</abbr> : <?php echo $stats["agi"] ?>  / 
-                <abbr title="Wisdom">WIS</abbr> : <?php echo $stats["wis"] ?> / 
-                <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?>  / 
-                <abbr title="Cunning">CUN</abbr> : <?php echo $stats["cun"] ?>
+                <abbr title="Cunning">CUN</abbr> : <?php echo $stats["cun"] ?> / 
+                <abbr title="Wisdom">WIS</abbr> : <?php echo $stats["wis"] ?>
 
                 <hr class="clear">
                 Your stat points are out of a total of 100, divided into 6 categories based on your class.

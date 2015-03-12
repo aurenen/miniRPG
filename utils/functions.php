@@ -371,6 +371,11 @@ function isNew($uid) {
 }
 
 function setStats($uid, $type) {
+    global $db;
+    // no need to call db_connect() or db_disconnect() here 
+    // because this is called within the setClass(), which 
+    // connects and disconnects
+
     define("WAR", 1);
     define("ENC", 2);
     define("RAN", 3);
@@ -451,6 +456,32 @@ function setStats($uid, $type) {
             # code...
             break;
     }
+
+    $sql = "INSERT INTO stats (id,exp,hp,sp,str,vit,dex,agi,cun,wis) VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL setStats prepare', $db->error);
+    if (!$stmt->bind_param('iiiiiiiiii', $uid, $exp, $hp, $sp, $str, $vit, $dex, $agi, $cun, $wis))
+        fail('MySQL setStats bind_param', $db->error);
+    if (!$stmt->execute()) {
+    /* Figure out why this failed - maybe the username is already taken?
+     * It could be more reliable/portable to issue a SELECT query here.  We would
+     * definitely need to do that (or at least include code to do it) if we were
+     * supporting multiple kinds of database backends, not just MySQL.  However,
+     * the prepared statements interface we're using is MySQL-specific anyway. */
+        $stmt->close();
+
+        fail('MySQL setStats execute', $db->error);
+        db_disconnect();
+
+        header('Location: selectclass.php?error');
+        exit();
+    }
+    else {
+        $stmt->close();
+    }
 }
 
 function setClass($uid, $type) {
@@ -484,7 +515,7 @@ function setClass($uid, $type) {
     else {
         $stmt->close();
         // call set stats function
-        // setStats($uid, $type);
+        setStats($uid, $type);
         db_disconnect();
         header('Location: profile.php?setclass');
         exit();
