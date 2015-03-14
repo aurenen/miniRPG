@@ -2,8 +2,6 @@
 require_once "utils/functions.php";
 
 if( isLogged() && isNew($_SESSION['uid']) ) {
-  $profile = getProfile($_SESSION['uid']);
-  $stats = getStats($_SESSION['uid']);
 
   if(isset($_POST['class_warrior'])) {
     setClass($_SESSION['uid'], 1);
@@ -28,9 +26,9 @@ include_once "header.php";
 
 ?>
 
-<h1>Select Your Class</h1>
 
 <div class="container-fluid">
+<h1>Select Your Class</h1>
   <form action="selectclass.php" method="post">
     <div class="row">
       <div class="col-sm-4"><div class="itembox">
