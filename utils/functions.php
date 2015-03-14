@@ -551,6 +551,27 @@ function getClass($uid) {
     return $class_name;
 }
 
+function classQuiz($score) {
+    if($score < 10) {
+        return "warrior";
+    }
+    else if($score < 15) {
+        return "templar";
+    }
+    else if($score < 20) {
+        return "enchanter";
+    }
+    else if($score < 25) {
+        return "mystic";
+    }
+    else if($score < 30) {
+        return "rogue";
+    }
+    else {
+        return "ranger";
+    }
+}
+
 
 /*****************************************
     Session Functions
