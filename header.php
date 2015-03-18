@@ -43,7 +43,7 @@
             <ul class="dropdown-menu" role="menu">
               <li><a href="profile.php">View Profile</a></li>
               <li class="divider"></li>
-              <li><a href="#">Settings</a></li>
+              <li><a href="settings.php">Settings</a></li>
               <li class="divider"></li>
               <li><a href="logout.php">Log Out</a></li>
             </ul>

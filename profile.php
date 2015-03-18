@@ -20,14 +20,6 @@ include_once "header.php";
 
       <div class="media">
         <h1><?php echo $profile["character_name"]; ?> <small><?php echo $chara_class ?></small></h1>
-        <p class="lead">
-          <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 
-          <abbr title="Vitality">VIT</abbr> : <?php echo $stats["vit"] ?> / 
-          <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?> / 
-          <abbr title="Agility">AGI</abbr> : <?php echo $stats["agi"] ?>  / 
-          <abbr title="Cunning">CUN</abbr> : <?php echo $stats["cun"] ?> / 
-          <abbr title="Wisdom">WIS</abbr> : <?php echo $stats["wis"] ?>
-        </p>
       </div>
 
 <div class="container-fluid">
@@ -61,6 +53,10 @@ include_once "header.php";
               <td><?php echo $profile['character_name'] ?></td>
             </tr>
             <tr>
+              <th>Gender</th>
+              <td><?php echo ucwords($profile['gender']) ?></td>
+            </tr>
+            <tr>
               <th>Class</th>
               <td><?php echo $chara_class ?></td>
             </tr>
@@ -75,6 +71,15 @@ include_once "header.php";
             <tr>
               <th>Stats</th>
               <td>
+                <abbr title="Health Points">HP</abbr> : <?php echo $stats["hp"] ?> / 
+                <abbr title="Skill Points">SP</abbr> : <?php echo $stats["sp"] ?>
+                <hr class="clear">
+                <abbr title="Experience">EXP</abbr> : <?php echo $stats["exp"] ?> / 100
+                <div class="progress">
+                  <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="<?php echo $stats["exp"] ?>" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
+                    <?php echo $stats["exp"] ?>%
+                  </div>
+                </div>
                 <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 
                 <abbr title="Vitality">VIT</abbr> : <?php echo $stats["vit"] ?> / 
                 <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?> / 
