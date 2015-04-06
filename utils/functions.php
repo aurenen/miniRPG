@@ -783,7 +783,7 @@ function updatePassword($uid, $pass, $newpass) {
 
         // hash password before inserting into db
         $hasher = new PasswordHash(8, FALSE);
-        $hash = $hasher->HashPassword($pass);
+        $hash = $hasher->HashPassword($newpass);
         if (strlen($hash) < 20)
             fail('Failed to hash new password');
         unset($hasher);
