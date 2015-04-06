@@ -18,86 +18,35 @@ if( isLogged() && !isNew($_SESSION['uid']) ) {
 include_once "header.php";
 ?>
 
-      <div class="media">
-        <h1><?php echo $profile["character_name"]; ?> <small><?php echo $chara_class ?></small></h1>
-      </div>
-
-<div class="container-fluid">
-  <div class="row">
-  <?php if ($url == "setclass") { ?>
-  <div class="alert alert-info" role="alert">You have successfully selected your character's class.</div>
-
-  <?php } if ($url == "updated") { ?>
-  <div class="alert alert-info" role="alert">You have successfully updated your profile.</div>
-  <?php } ?>
-    <div class="col-sm-4">
-      <div class="profile-avatar">
-        <img class="center-block" src="http://placehold.it/200x300" alt="Avatar" />
-      </div>
-    </div>
-    <div class="col-sm-8">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th></th>
-              <th width="75%"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>Email</th>
-              <td><?php echo $profile['email'] ?></td>
-            </tr>
-            <tr>
-              <th>Character Name</th>
-              <td><?php echo $profile['character_name'] ?></td>
-            </tr>
-            <tr>
-              <th>Gender</th>
-              <td><?php echo ucwords($profile['gender']) ?></td>
-            </tr>
-            <tr>
-              <th>Class</th>
-              <td><?php echo $chara_class ?></td>
-            </tr>
-            <tr>
-              <th>Level</th>
-              <td><?php echo $profile['level'] ?></td>
-            </tr>
-            <tr>
-              <th>Money</th>
-              <td><?php echo $profile['money'] ?></td>
-            </tr>
-            <tr>
-              <th>Stats</th>
-              <td>
-                <abbr title="Health Points">HP</abbr> : <?php echo $stats["hp"] ?> / 
-                <abbr title="Skill Points">SP</abbr> : <?php echo $stats["sp"] ?>
-                <hr class="clear">
-                <abbr title="Experience">EXP</abbr> : <?php echo $stats["exp"] ?> / 100
-                <div class="progress">
-                  <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="<?php echo $stats["exp"] ?>" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
-                    <?php echo $stats["exp"] ?>%
-                  </div>
-                </div>
-                <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 
-                <abbr title="Vitality">VIT</abbr> : <?php echo $stats["vit"] ?> / 
-                <abbr title="Dexterity">DEX</abbr> : <?php echo $stats["dex"] ?> / 
-                <abbr title="Agility">AGI</abbr> : <?php echo $stats["agi"] ?>  / 
-                <abbr title="Cunning">CUN</abbr> : <?php echo $stats["cun"] ?> / 
-                <abbr title="Wisdom">WIS</abbr> : <?php echo $stats["wis"] ?>
-
-                <hr class="clear">
-                Your stat points are out of a total of 100, divided into 6 categories based on your class.
-                <hr class="clear">
-                Higher VIT means more health points, which may help you survive monster encounters. More WIS means more magic power, so you can defeat monsters better. And the greater your AGI, the greater chance you have of dodging attacks.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-    </div>
-  </div>
-</div> <!-- end .container-fluid -->
+<h1>Battleground</h1>
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Username</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Mark</td>
+        <td>Otto</td>
+        <td>@mdo</td>
+      </tr>
+      <tr>
+        <td>Jacob</td>
+        <td>Thornton</td>
+        <td>@fat</td>
+      </tr>
+      <tr>
+        <td>Larry</td>
+        <td>the Bird</td>
+        <td>@twitter</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 
 <?php } // end isLogged()

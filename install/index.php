@@ -30,6 +30,8 @@ if ($url == "create") {
 	        die('There was an error running the query [' . $db->error . ']');
 	    }
 	}
+
+	echo "<p>Successfully created tables!</p>";
 }
 
 

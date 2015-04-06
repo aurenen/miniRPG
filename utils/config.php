@@ -19,5 +19,6 @@ $cookie_path = '/cs490/';
 
 $site_title = 'MiniRPG';
 
+// Set timezone
 session_set_cookie_params(3600, $cookie_path, $cookie_domain, false, true);
 date_default_timezone_set('America/Los_Angeles');
