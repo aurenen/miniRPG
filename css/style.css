@@ -37,6 +37,36 @@ div.jumbotron.first {
     padding: 20px 0 0 0;
 }
 
+.progress .progress-bar {
+    font-size: 13px;
+    line-height: 25px;
+}
+.progress {
+    margin: 10px 0;
+    height: 25px;
+}
+
+.battle {
+    background-image: url('../images/battle_bg.jpg');
+    background-size: cover;  
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+}
+.battle-chara img {
+    height: 300px;
+    /*background-color: #ddd;*/
+}
+
+.battle-monster img {
+    height: 300px;
+    /*background-color: #e9e9e9;*/
+}
+
+.battle-control {
+    background-color: #eee;
+}
+
 /* responsive header image */
 @media (max-width: 480px) {
     #headimg {
