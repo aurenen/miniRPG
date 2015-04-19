@@ -56,6 +56,70 @@ function cleanSQL($val) {
     return $db->real_escape_string($val);
 }
 
+
+/*****************************************
+    Monster Functions
+*****************************************/
+
+function createMonster() {
+    global $db;
+    db_connect();
+
+    // read from a file and insert values into monster table
+    $fp = fopen('flat-file-data.txt','r');
+    if (!$fp) {echo 'ERROR: Unable to open file.'; exit;}
+    $loop = 0;
+    while (!feof($fp)) {
+        $loop++;
+        $line = fgets($fp, 1024); //use 2048 if very long lines
+        $field[$loop] = explode ('|', $line);
+
+        $fp++;
+    }
+
+    $hp; $sp; $str; $vit; $dex; $agi; $cun; $wis; $exp = 50;
+    // stats start out from a total of 30 points (avg of 5 pts * 6 areas)
+
+    for ($mid=1; $mid < 11; $mid++) { 
+        
+        $hp = 45 + rand(1, 15);
+        $sp = 20 + rand(1, 10);
+        $str = 1 + rand(1, 9);
+        $vit = 1 + rand(1, 9);
+        $dex = 1 + rand(1, 9);
+        $agi = 1 + rand(1, 9);
+        $cun = 1 + rand(1, 9);
+        $wis = 1 + rand(1, 9);
+
+        $sql = "INSERT INTO monster_stats (id,exp,hp,sp,str,vit,dex,agi,cun,wis) VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+        $stmt = $db->prepare($sql);
+
+        if (!$stmt) 
+            fail('MySQL createMonster prepare', $db->error);
+        if (!$stmt->bind_param('iiiiiiiiii', $mid, $exp, $hp, $sp, $str, $vit, $dex, $agi, $cun, $wis))
+            fail('MySQL createMonster bind_param', $db->error);
+        if (!$stmt->execute()) {
+        /* Figure out why this failed - maybe the username is already taken?
+         * It could be more reliable/portable to issue a SELECT query here.  We would
+         * definitely need to do that (or at least include code to do it) if we were
+         * supporting multiple kinds of database backends, not just MySQL.  However,
+         * the prepared statements interface we're using is MySQL-specific anyway. */
+            $stmt->close();
+
+            fail('MySQL createMonster execute', $db->error);
+            db_disconnect();
+
+            // header('Location: selectclass.php?error');
+            exit();
+        }
+        else { // success!!
+            $stmt->close();
+            db_disconnect();
+        }
+    }
+}
+
 /*****************************************
     User Account Functions
 *****************************************/
@@ -167,14 +231,16 @@ function login($user, $pass) {
     }
 
     // check if email exists
-    $sql = "SELECT * FROM users WHERE email=?";
+    $sql = "SELECT uid FROM users WHERE email=?";
 
     $stmt = $db->prepare($sql);
     $stmt->bind_param('s', $user);
 
     $stmt->execute();
-    $result = $stmt->get_result();
-    $result->fetch_row();
+    $stmt->bind_result($result);
+    // $result = $stmt->get_result();
+    // $result->fetch_row();
+    $stmt->fetch();
 
     if ($result->num_rows === 0) { 
         header('Location: login.php?failed');
@@ -564,7 +630,7 @@ function getClassList() {
     if (!$stmt->execute())
         fail('MySQL getClassList execute', $stmt->error);
 
-    $result = $stmt->get_result();;
+    $result = $stmt->get_result();
 
     $class_list = array();
     while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
