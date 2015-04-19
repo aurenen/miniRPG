@@ -1,27 +1,68 @@
 <?php
+session_start();
+session_regenerate_id(true);
+
 require_once 'config.php';
+require_once 'PasswordHash.php';
+
+/*****************************************
+    Database Related Functions
+*****************************************/
+
+$db; // global mysqli connection object
+$profile = array(); // global profile array
+function db_connect() {
+    global $db, $db_host, $db_user, $db_pass, $db_name;
+    $db = new mysqli($db_host, $db_user, $db_pass, $db_name, 3306);
+
+    if($db->connect_errno > 0) {
+        die('Unable to connect to database [' . $db->connect_error . ']');
+    }
+}
+
+function db_disconnect() {
+    global $db;
+    $db->close();
+}
+
+function fail($pub, $pvt = '') {
+    $debug = true;
+    $msg = $pub;
+    if ($debug && $pvt !== '')
+        $msg .= ": $pvt";
+/* The $pvt debugging messages may contain characters that would need to be
+ * quoted if we were producing HTML output, like we would be in a real app,
+ * but we're using text/plain here.  Also, $debug is meant to be disabled on
+ * a "production install" to avoid leaking server setup details. */
+    exit("An error occurred ($msg).\n");
+}
+
+/*****************************************
+    Misc Functions
+*****************************************/
+
+function get_post_var($var) {
+    $val = $_POST[$var];
+    if (get_magic_quotes_gpc())
+        $val = stripslashes($val);
+    return $val;
+}
 
 function cleanPOST($form) {
     return htmlspecialchars($form);
 }
 function cleanSQL($val) {
-    return mysql_real_escape_string($val);
-}
-function db_connect() {
-	$db = new mysqli($db_host, $db_user, $db_pass, $db_name);
-
-	if($db->connect_errno > 0){
-	    die('Unable to connect to database [' . $db->connect_error . ']');
-	}
+    global $db;
+    return $db->real_escape_string($val);
 }
 
 /*****************************************
-    User and Database Functions
+    User Account Functions
 *****************************************/
 
 function registerAccount($email, $pass, $chara, $gender) {
 
-    global $link;
+    global $db;
     db_connect();
 
     // clean up input
@@ -30,31 +71,765 @@ function registerAccount($email, $pass, $chara, $gender) {
     $chara = cleanSQL($chara);
     $gender = cleanSQL($gender);
 
-    // check if email already registered
-    $sql = "SELECT * FROM Users WHERE u_email='$email'";
+    // check if email is real
+    if (!preg_match('/^[a-zA-Z0-9_.@-]{1,60}$/', $email)) { 
+        header('Location: register.php?invalid_email');
+        exit();
+    }
+    // check password length, bcrypt only uses the first 72 characters
+    if (strlen($pass) > 72) { 
+        header('Location: register.php?invalid_password');
+        exit();
+    }
 
-    $go = $db->query($sql);
-    if ($go === true) { 
+    // mysqli_report(MYSQLI_REPORT_ALL);
+    
+    // check if email already registered
+    $sql = "SELECT * FROM users WHERE email=?";
+
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    if ($stmt->num_rows != 0) { 
         header('Location: register.php?error');
         exit();
     }
-    else { // if no matching email in db
-        $sql = "INSERT INTO Users (u_email, u_password, u_charactername, u_class)
-          VALUES ('$email','$pass','$chara','default')";
+    $stmt->close();
 
-        $go = $db->query($sql);
-        if ($go === false) { 
-            die('Error: ' . $db->connect_error); 
-        }
-        else {
-            header('Location: login.php?regsuccess');
+    // hash password before inserting into db
+    $hasher = new PasswordHash(8, FALSE);
+    $hash = $hasher->HashPassword($pass);
+    if (strlen($hash) < 20)
+        fail('Failed to hash new password');
+    unset($hasher);
+
+    $one = 1;
+    $zero = 0;
+
+    $sql = "INSERT INTO users (email, password, level, character_name, character_class, gender, money, location, new)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL registration prepare', $db->error);
+    if (!$stmt->bind_param('ssisisiii', $email, $hash, $one, $chara, $zero, $gender, $zero, $zero, $one))
+        fail('MySQL registration bind_param', $db->error);
+    if (!$stmt->execute()) {
+    /* Figure out why this failed - maybe the username is already taken?
+     * It could be more reliable/portable to issue a SELECT query here.  We would
+     * definitely need to do that (or at least include code to do it) if we were
+     * supporting multiple kinds of database backends, not just MySQL.  However,
+     * the prepared statements interface we're using is MySQL-specific anyway. */
+        $stmt->close();
+        db_disconnect();
+
+        if ($db->errno === 1062 /* ER_DUP_ENTRY */) {
+            header('Location: register.php?error');
             exit();
         }
+        else
+            fail('MySQL registration execute', $db->error);
     }
 
-    db_disconnect();
+    // $sql = "INSERT INTO Users (email, password, level, character_name, character_class, gender, stat_id, money, location)
+    //   VALUES ('$email','$pass','1','$chara','novice','$gender',NULL,'0','0')";
+
+    // $go = $db->query($sql);
+    // if ($go === false) { 
+    //     die('Error: ' . $db->connect_error); 
+    // }
+    else {
+        $stmt->close();
+        db_disconnect();
+        header('Location: login.php?regsuccess');
+        exit();
+    }
 }
 
-function db_disconnect() {
-	$db_connect->close();
+
+function login($user, $pass) {
+    global $db, $profile;
+    db_connect();
+
+    $user = cleanSQL($user);
+    $pass = cleanSQL($pass);
+
+    // check if email is real
+    if (!preg_match('/^[a-zA-Z0-9_.@-]{1,60}$/', $user)) { 
+        header('Location: login.php?error');
+        exit();
+    }
+    // check password length, bcrypt only uses the first 72 characters
+    if (strlen($pass) > 72) { 
+        header('Location: login.php?error');
+        exit();
+    }
+
+    // check if email exists
+    $sql = "SELECT * FROM users WHERE email=?";
+
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param('s', $user);
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $result->fetch_row();
+
+    if ($result->num_rows === 0) { 
+        header('Location: login.php?failed');
+        exit();
+    }
+    $stmt->close();
+
+    // hash password before inserting into db
+    $hasher = new PasswordHash(8, FALSE);
+
+    $sql = "SELECT password, uid FROM users WHERE email=?";
+
+    // mysqli_report(MYSQLI_REPORT_ALL);
+
+    $hash = '*'; // In case the user is not found
+
+    $stmt = $db->prepare($sql);
+    if (!$stmt) 
+        fail('MySQL login prepare', $stmt->error);
+    if (!$stmt->bind_param('s', $user))
+        fail('MySQL login bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL login execute', $stmt->error);
+    if (!$stmt->bind_result($hash, $uid))
+        fail('MySQL login bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL login fetch', $stmt->error);
+
+    if ($hasher->CheckPassword($pass, $hash)) { // Redirect to home page after successful login.
+        $_SESSION['active'] = true;
+        $_SESSION['uid'] = $uid;
+        setcookie('uid', $_SESSION['uid']);
+        // $_SESSION['user_name'] = $result['u_charactername'];
+        // $_SESSION['user_email'] = $result['u_email'];
+        // $_SESSION['user_class'] = $result['u_class'];
+
+        unset($hasher);
+        $stmt->close();
+        db_disconnect();
+        header('Location: index.php');
+        // call a function to query for all user info based on $uid
+        exit();
+    } 
+    else { // Incorrect password. So, redirect to login_form again.
+        unset($hasher);
+        $stmt->close();
+        db_disconnect();
+        header('Location: login.php?error');
+        exit();
+    }
+
+    //DEBUG
+    //print_r($_SESSION);
+
+        // setCookieInfo();
+        // redirectHome();
+}
+
+function getCharacterName($uid) {
+    global $db;
+    db_connect();
+
+    // check if uid exists
+    // $sql = "SELECT * FROM users WHERE uid=?";
+
+    // $stmt = $db->prepare($sql);
+    // $stmt->bind_param('i', $uid);
+
+    // $stmt->execute();
+    // $result = $stmt->get_result();
+    // $result->fetch_row();
+
+    // if ($result->num_rows === 0) { 
+    //     header('Location: profile.php?uid=failed');
+    //     exit();
+    // }
+    // $stmt->close();
+
+    $sql = "SELECT character_name FROM users WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getCharacterName prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getCharacterName bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getCharacterName execute', $stmt->error);
+    if (!$stmt->bind_result($name))
+        fail('MySQL getCharacterName bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL getCharacterName fetch', $stmt->error);
+
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) { 
+        db_disconnect();
+        header('Location: login.php?failed');
+        exit();
+    }
+    db_disconnect();
+    return $name;
+}
+
+function getProfile($uid) {
+    global $db;
+    db_connect();
+
+    // check if uid exists
+    // $sql = "SELECT * FROM users WHERE uid=?";
+
+    // $stmt = $db->prepare($sql);
+    // $stmt->bind_param('i', $uid);
+
+    // $stmt->execute();
+    // $result = $stmt->get_result();
+    // $result->fetch_row();
+
+    // if ($result->num_rows === 0) { 
+    //     header('Location: profile.php?uid=failed');
+    //     exit();
+    // }
+    // $stmt->close();
+
+    $sql = "SELECT * FROM users WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getProfile prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getProfile bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getProfile execute', $stmt->error);
+
+    $result = $stmt->get_result();
+    // $row = $result->fetch_array(MYSQLI_ASSOC);
+    $row = $result->fetch_assoc();
+    $result->free();
+    db_disconnect();
+    return $row;
+}
+
+function getStats($uid) {
+    global $db;
+    db_connect();
+
+    $sql = "SELECT exp, hp, sp, str, vit, dex, agi, cun, wis FROM users, stats WHERE id=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getStats prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getStats bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getStats execute', $stmt->error);
+
+    $result = $stmt->get_result();
+    // $row = $result->fetch_array(MYSQLI_ASSOC);
+    $row = $result->fetch_assoc();
+    $result->free();
+    db_disconnect();
+    return $row;
+}
+
+function isNew($uid) {
+    global $db;
+    db_connect();
+    // if new = true, make them select a class
+    // else they can't select class
+    $sql = "SELECT new FROM users WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL isNew prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL isNew bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL isNew execute', $stmt->error);
+    if (!$stmt->bind_result($flag))
+        fail('MySQL isNew bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL isNew fetch', $stmt->error);
+
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) { 
+        db_disconnect();
+        header('Location: login.php?failed');
+        exit();
+    }
+    db_disconnect();
+    return $flag;
+}
+
+function setStats($uid, $type) {
+    global $db;
+    // no need to call db_connect() or db_disconnect() here 
+    // because this is called within the setClass(), which 
+    // connects and disconnects
+
+    define("WAR", 1);
+    define("ENC", 2);
+    define("RAN", 3);
+    define("TEM", 4);
+    define("MYS", 5);
+    define("ROG", 6);
+
+    $hp; $sp; $str; $vit; $dex; $agi; $cun; $wis; $exp = 0;
+    // stats start out from a total of 30 points (avg of 5 pts * 6 areas)
+    switch ($type) {
+        case WAR:
+            $hp = 45;
+            $sp = 15;
+            $str = 9;
+            $vit = 8;
+            $dex = 5;
+            $agi = 3;
+            $cun = 3;
+            $wis = 2;
+            break;
+        
+        case ENC:
+            $hp = 25;
+            $sp = 55;
+            $str = 1;
+            $vit = 2;
+            $dex = 9;
+            $agi = 2;
+            $cun = 6;
+            $wis = 10;
+            break;
+        
+        case RAN:
+            $hp = 35;
+            $sp = 25;
+            $str = 2;
+            $vit = 4;
+            $dex = 10;
+            $agi = 8;
+            $cun = 4;
+            $wis = 2;
+            break;
+        
+        case TEM:
+            $hp = 55;
+            $sp = 30;
+            $str = 7;
+            $vit = 9;
+            $dex = 4;
+            $agi = 2;
+            $cun = 2;
+            $wis = 6;
+            break;
+        
+        case MYS:
+            $hp = 50;
+            $sp = 50;
+            $str = 1;
+            $vit = 10;
+            $dex = 6;
+            $agi = 2;
+            $cun = 2;
+            $wis = 9;
+            break;
+        
+        case ROG:
+            $hp = 30;
+            $sp = 25;
+            $str = 2;
+            $vit = 3;
+            $dex = 5;
+            $agi = 10;
+            $cun = 8;
+            $wis = 2;
+            break;
+        
+        default:
+            # code...
+            break;
+    }
+
+    $sql = "INSERT INTO stats (id,exp,hp,sp,str,vit,dex,agi,cun,wis) VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL setStats prepare', $db->error);
+    if (!$stmt->bind_param('iiiiiiiiii', $uid, $exp, $hp, $sp, $str, $vit, $dex, $agi, $cun, $wis))
+        fail('MySQL setStats bind_param', $db->error);
+    if (!$stmt->execute()) {
+    /* Figure out why this failed - maybe the username is already taken?
+     * It could be more reliable/portable to issue a SELECT query here.  We would
+     * definitely need to do that (or at least include code to do it) if we were
+     * supporting multiple kinds of database backends, not just MySQL.  However,
+     * the prepared statements interface we're using is MySQL-specific anyway. */
+        $stmt->close();
+
+        fail('MySQL setStats execute', $db->error);
+        db_disconnect();
+
+        header('Location: selectclass.php?error');
+        exit();
+    }
+    else {
+        $stmt->close();
+    }
+}
+
+function setClass($uid, $type) {
+    global $db;
+    db_connect();
+
+    $sql = "UPDATE users SET character_class=?, new=? WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+
+    $new = 0;
+
+    if (!$stmt) 
+        fail('MySQL setClass prepare', $db->error);
+    if (!$stmt->bind_param('iii', $type, $new, $uid))
+        fail('MySQL setClass bind_param', $db->error);
+    if (!$stmt->execute()) {
+    /* Figure out why this failed - maybe the username is already taken?
+     * It could be more reliable/portable to issue a SELECT query here.  We would
+     * definitely need to do that (or at least include code to do it) if we were
+     * supporting multiple kinds of database backends, not just MySQL.  However,
+     * the prepared statements interface we're using is MySQL-specific anyway. */
+        $stmt->close();
+
+        fail('MySQL setClass execute', $db->error);
+        db_disconnect();
+
+        header('Location: selectclass.php?error');
+        exit();
+    }
+    else {
+        $stmt->close();
+        // call set stats function
+        setStats($uid, $type);
+        db_disconnect();
+        header('Location: profile.php?setclass');
+        exit();
+    }
+}
+
+function getClass($uid) {
+    global $db;
+    db_connect();
+
+    $sql = "SELECT classes.type FROM classes LEFT JOIN users ON classes.cid = users.character_class WHERE users.uid = ?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getClass prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getClass bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getClass execute', $stmt->error);
+    if (!$stmt->bind_result($class_name))
+        fail('MySQL getClass bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL getClass fetch', $stmt->error);
+
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) { 
+        db_disconnect();
+        header('Location: login.php?failed');
+        exit();
+    }
+    db_disconnect();
+    return $class_name;
+}
+
+function getClassList() {
+    global $db;
+    db_connect();
+
+    $sql = "SELECT cid,type FROM classes";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getClassList prepare', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getClassList execute', $stmt->error);
+
+    $result = $stmt->get_result();;
+
+    $class_list = array();
+    while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+        array_push($class_list, $row);
+    }
+
+    $result->free();
+    db_disconnect();
+    return $class_list;
+}
+
+function classQuiz($score) {
+    if($score < 10) {
+        return "warrior";
+    }
+    else if($score < 15) {
+        return "templar";
+    }
+    else if($score < 20) {
+        return "enchanter";
+    }
+    else if($score < 25) {
+        return "mystic";
+    }
+    else if($score < 30) {
+        return "rogue";
+    }
+    else {
+        return "ranger";
+    }
+}
+
+function updateName($uid, $pass, $name) {
+    global $db;
+    db_connect();
+    
+    $name = cleanSQL($name);
+    $pass = cleanSQL($pass);
+
+    // check password length, bcrypt only uses the first 72 characters
+    if (strlen($pass) > 72) { 
+        header('Location: settings.php?incorrectpass');
+        exit();
+    }
+
+    // hash password before inserting into db
+    $hasher = new PasswordHash(8, FALSE);
+
+    $sql = "SELECT password FROM users WHERE uid=?";
+
+    // mysqli_report(MYSQLI_REPORT_ALL);
+
+    $hash = '*'; // In case the user is not found
+
+    $stmt = $db->prepare($sql);
+    if (!$stmt) 
+        fail('MySQL updateName prepare', $stmt->error);
+    if (!$stmt->bind_param('s', $uid))
+        fail('MySQL updateName bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL updateName execute', $stmt->error);
+    if (!$stmt->bind_result($hash))
+        fail('MySQL updateName bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL updateName fetch', $stmt->error);
+
+    if ($hasher->CheckPassword($pass, $hash)) { // Redirect to home page after successful login.
+        unset($hasher);
+        $stmt->close();
+
+        $sql = "UPDATE users SET character_name=? WHERE uid=?";
+        $stmt = $db->prepare($sql);
+
+        if (!$stmt) 
+            fail('MySQL updateName prepare', $db->error);
+        if (!$stmt->bind_param('si', $name, $uid))
+            fail('MySQL updateName bind_param', $db->error);
+        if (!$stmt->execute()) {
+        /* Figure out why this failed - maybe the username is already taken?
+         * It could be more reliable/portable to issue a SELECT query here.  We would
+         * definitely need to do that (or at least include code to do it) if we were
+         * supporting multiple kinds of database backends, not just MySQL.  However,
+         * the prepared statements interface we're using is MySQL-specific anyway. */
+            $stmt->close();
+
+            fail('MySQL setClass execute', $db->error);
+            db_disconnect();
+
+            header('Location: settings.php?name_error');
+            exit();
+        }
+        else { // success
+            $stmt->close();
+            db_disconnect();
+        }
+    } 
+    else { // Incorrect password. So, redirect to login_form again.
+        unset($hasher);
+        $stmt->close();
+        db_disconnect();
+        header('Location: settings.php?incorrectpass');
+        exit();
+    }
+}
+
+function updateClass($uid, $pass, $class) {
+    global $db;
+    db_connect();
+    
+    $class = cleanSQL($class);
+    $pass = cleanSQL($pass);
+
+    // check password length, bcrypt only uses the first 72 characters
+    if (strlen($pass) > 72) { 
+        header('Location: settings.php?incorrectpass');
+        exit();
+    }
+
+    // hash password before inserting into db
+    $hasher = new PasswordHash(8, FALSE);
+
+    $sql = "SELECT password FROM users WHERE uid=?";
+
+    // mysqli_report(MYSQLI_REPORT_ALL);
+
+    $hash = '*'; // In case the user is not found
+
+    $stmt = $db->prepare($sql);
+    if (!$stmt) 
+        fail('MySQL updateName prepare', $stmt->error);
+    if (!$stmt->bind_param('s', $uid))
+        fail('MySQL updateName bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL updateName execute', $stmt->error);
+    if (!$stmt->bind_result($hash))
+        fail('MySQL updateName bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL updateName fetch', $stmt->error);
+
+    if ($hasher->CheckPassword($pass, $hash)) { // Redirect to home page after successful login.
+        unset($hasher);
+        $stmt->close();
+
+        $sql = "UPDATE users SET character_class=? WHERE uid=?";
+        $stmt = $db->prepare($sql);
+
+        if (!$stmt) 
+            fail('MySQL updateName prepare', $db->error);
+        if (!$stmt->bind_param('ii', $class, $uid))
+            fail('MySQL updateName bind_param', $db->error);
+        if (!$stmt->execute()) {
+        /* Figure out why this failed - maybe the username is already taken?
+         * It could be more reliable/portable to issue a SELECT query here.  We would
+         * definitely need to do that (or at least include code to do it) if we were
+         * supporting multiple kinds of database backends, not just MySQL.  However,
+         * the prepared statements interface we're using is MySQL-specific anyway. */
+            $stmt->close();
+
+            fail('MySQL setClass execute', $db->error);
+            db_disconnect();
+
+            header('Location: settings.php?class_error');
+            exit();
+        }
+        else { // success
+            $stmt->close();
+            db_disconnect();
+        }
+    } 
+    else { // Incorrect password. So, redirect to login_form again.
+        unset($hasher);
+        $stmt->close();
+        db_disconnect();
+        header('Location: settings.php?incorrectpass');
+        exit();
+    }
+}
+
+function updatePassword($uid, $pass, $newpass) {
+    global $db;
+    db_connect();
+    
+    $newpass = cleanSQL($newpass);
+    $pass = cleanSQL($pass);
+
+    // check password length, bcrypt only uses the first 72 characters
+    if (strlen($pass) > 72) { 
+        header('Location: settings.php?incorrectpass');
+        exit();
+    }
+
+    // hash password before inserting into db
+    $hasher = new PasswordHash(8, FALSE);
+
+    $sql = "SELECT password FROM users WHERE uid=?";
+
+    // mysqli_report(MYSQLI_REPORT_ALL);
+
+    $hash = '*'; // In case the user is not found
+
+    $stmt = $db->prepare($sql);
+    if (!$stmt) 
+        fail('MySQL updateName prepare', $stmt->error);
+    if (!$stmt->bind_param('s', $uid))
+        fail('MySQL updateName bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL updateName execute', $stmt->error);
+    if (!$stmt->bind_result($hash))
+        fail('MySQL updateName bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL updateName fetch', $stmt->error);
+
+    if ($hasher->CheckPassword($pass, $hash)) { // Redirect to home page after successful login.
+        unset($hasher);
+        $stmt->close();
+
+        // hash password before inserting into db
+        $hasher = new PasswordHash(8, FALSE);
+        $hash = $hasher->HashPassword($newpass);
+        if (strlen($hash) < 20)
+            fail('Failed to hash new password');
+        unset($hasher);
+
+
+        $sql = "UPDATE users SET password=? WHERE uid=?";
+        $stmt = $db->prepare($sql);
+
+        if (!$stmt) 
+            fail('MySQL updateName prepare', $db->error);
+        if (!$stmt->bind_param('si', $hash, $uid))
+            fail('MySQL updateName bind_param', $db->error);
+        if (!$stmt->execute()) {
+        /* Figure out why this failed - maybe the username is already taken?
+         * It could be more reliable/portable to issue a SELECT query here.  We would
+         * definitely need to do that (or at least include code to do it) if we were
+         * supporting multiple kinds of database backends, not just MySQL.  However,
+         * the prepared statements interface we're using is MySQL-specific anyway. */
+            $stmt->close();
+
+            fail('MySQL setClass execute', $db->error);
+            db_disconnect();
+
+            header('Location: settings.php?class_error');
+            exit();
+        }
+        else { // success
+            $stmt->close();
+            db_disconnect();
+        }
+    } 
+    else { // Incorrect password. So, redirect to login_form again.
+        unset($hasher);
+        $stmt->close();
+        db_disconnect();
+        header('Location: settings.php?incorrectpass');
+        exit();
+    }
+}
+
+
+/*****************************************
+    Session Functions
+*****************************************/
+
+function isLogged() {
+    if (isset($_SESSION['active']) && $_SESSION['active']===true) return true; 
+    else return false;
 }
