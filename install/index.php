@@ -20,6 +20,7 @@ else {
 
 echo "<h2>Installer</h2>\n";
 echo "<p><a href='index.php?create'>Create tables</a></p>\n";
+echo "<p><a href='index.php?monster'>Create monster tables</a></p>\n";
 
 if ($url == "create") { 
 	$create = file_get_contents("create.sql");
@@ -32,6 +33,29 @@ if ($url == "create") {
 	}
 
 	echo "<p>Successfully created tables!</p>";
+}if ($url == "monster") { 
+	$sql = "CREATE TABLE monster_stats (
+	    id INTEGER,
+	    exp INTEGER,
+	    hp INTEGER,
+	    sp INTEGER,
+	    str INTEGER,
+	    vit INTEGER,
+	    dex INTEGER,
+	    agi INTEGER,
+	    cun INTEGER,
+	    wis INTEGER,
+	    UNIQUE (id)
+	)";
+
+	$go = $db->query($sql);
+
+	    if ($go === false) { 
+	        die('Error: ' . $db->connect_error); 
+	    }
+	    else {
+	    	echo "<p>Successfully created monster tables!</p>";
+	    }
 }
 
 
