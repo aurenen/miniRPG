@@ -117,7 +117,7 @@ function createMonster() {
             $stmt->close();
             db_disconnect();
         }
-    }
+    } // end for
 }
 
 /*****************************************
@@ -196,13 +196,6 @@ function registerAccount($email, $pass, $chara, $gender) {
             fail('MySQL registration execute', $db->error);
     }
 
-    // $sql = "INSERT INTO Users (email, password, level, character_name, character_class, gender, stat_id, money, location)
-    //   VALUES ('$email','$pass','1','$chara','novice','$gender',NULL,'0','0')";
-
-    // $go = $db->query($sql);
-    // if ($go === false) { 
-    //     die('Error: ' . $db->connect_error); 
-    // }
     else {
         $stmt->close();
         db_disconnect();
@@ -237,9 +230,9 @@ function login($user, $pass) {
     $stmt->bind_param('s', $user);
 
     $stmt->execute();
-    $stmt->bind_result($result);
     // $result = $stmt->get_result();
     // $result->fetch_row();
+    $stmt->bind_result($result);
     $stmt->fetch();
 
     if ($result->num_rows === 0) { 
@@ -273,9 +266,6 @@ function login($user, $pass) {
         $_SESSION['active'] = true;
         $_SESSION['uid'] = $uid;
         setcookie('uid', $_SESSION['uid']);
-        // $_SESSION['user_name'] = $result['u_charactername'];
-        // $_SESSION['user_email'] = $result['u_email'];
-        // $_SESSION['user_class'] = $result['u_class'];
 
         unset($hasher);
         $stmt->close();
@@ -334,7 +324,9 @@ function getCharacterName($uid) {
     if (!$stmt->fetch() && $stmt->errno)
         fail('MySQL getCharacterName fetch', $stmt->error);
 
-    $result = $stmt->get_result();
+    // $result = $stmt->get_result();
+    $stmt->bind_result($result);
+    $stmt->fetch();
     if ($result->num_rows === 0) { 
         db_disconnect();
         header('Location: login.php?failed');
@@ -376,7 +368,8 @@ function getProfile($uid) {
         fail('MySQL getProfile execute', $stmt->error);
 
     $result = $stmt->get_result();
-    // $row = $result->fetch_array(MYSQLI_ASSOC);
+    // $stmt->bind_result($result);
+    // $stmt->fetch();
     $row = $result->fetch_assoc();
     $result->free();
     db_disconnect();
@@ -399,7 +392,8 @@ function getStats($uid) {
         fail('MySQL getStats execute', $stmt->error);
 
     $result = $stmt->get_result();
-    // $row = $result->fetch_array(MYSQLI_ASSOC);
+    // $stmt->bind_result($result);
+    // $stmt->fetch();
     $row = $result->fetch_assoc();
     $result->free();
     db_disconnect();
@@ -607,7 +601,9 @@ function getClass($uid) {
     if (!$stmt->fetch() && $stmt->errno)
         fail('MySQL getClass fetch', $stmt->error);
 
-    $result = $stmt->get_result();
+    // $result = $stmt->get_result();
+    $stmt->bind_result($result);
+    $stmt->fetch();
     if ($result->num_rows === 0) { 
         db_disconnect();
         header('Location: login.php?failed');
@@ -630,7 +626,9 @@ function getClassList() {
     if (!$stmt->execute())
         fail('MySQL getClassList execute', $stmt->error);
 
-    $result = $stmt->get_result();
+    // $result = $stmt->get_result();
+    $stmt->bind_result($result);
+    $stmt->fetch();
 
     $class_list = array();
     while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
