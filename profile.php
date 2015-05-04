@@ -19,7 +19,7 @@ include_once "header.php";
 ?>
 
       <div class="media">
-        <h1><?php echo $profile[character_name]; ?> <small><?php echo $chara_class ?></small></h1>
+        <h1><?php echo $profile["character_name"]; ?> <small><?php echo $chara_class ?></small></h1>
       </div>
 
 <div class="container-fluid">

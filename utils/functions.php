@@ -383,7 +383,7 @@ function getProfile($uid) {
         foreach($row as $key => $val) { 
             $c[$key] = $val; 
         } 
-        $profile_list[] = $c; 
+        $profile_list = $c; 
     } 
     $stmt->close(); 
 
@@ -423,7 +423,7 @@ function getStats($uid) {
         foreach($row as $key => $val) { 
             $c[$key] = $val; 
         } 
-        $stat_list[] = $c; 
+        $stat_list = $c; 
     } 
     $stmt->close(); 
 
