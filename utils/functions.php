@@ -367,13 +367,28 @@ function getProfile($uid) {
     if (!$stmt->execute())
         fail('MySQL getProfile execute', $stmt->error);
 
-    $result = $stmt->get_result();
+    // $result = $stmt->get_result();
     // $stmt->bind_result($result);
     // $stmt->fetch();
-    $row = $result->fetch_assoc();
-    $result->free();
+    // $row = $result->fetch_assoc();
+    // $result->free();
+    $meta = $stmt->result_metadata(); 
+
+    while ($field = $meta->fetch_field()) { 
+        $params[] = &$row[$field->name]; 
+    } 
+
+    call_user_func_array(array($stmt, 'bind_result'), $params);            
+    while ($stmt->fetch()) { 
+        foreach($row as $key => $val) { 
+            $c[$key] = $val; 
+        } 
+        $profile_list = $c; 
+    } 
+    $stmt->close(); 
+
     db_disconnect();
-    return $row;
+    return $profile_list;
 }
 
 function getStats($uid) {
@@ -391,13 +406,29 @@ function getStats($uid) {
     if (!$stmt->execute())
         fail('MySQL getStats execute', $stmt->error);
 
-    $result = $stmt->get_result();
+    // $result = $stmt->get_result();
     // $stmt->bind_result($result);
     // $stmt->fetch();
-    $row = $result->fetch_assoc();
-    $result->free();
+    // $row = $result->fetch_assoc();
+    // $result->free();
+
+    $meta = $stmt->result_metadata(); 
+
+    while ($field = $meta->fetch_field()) { 
+        $params[] = &$row[$field->name]; 
+    } 
+
+    call_user_func_array(array($stmt, 'bind_result'), $params);            
+    while ($stmt->fetch()) { 
+        foreach($row as $key => $val) { 
+            $c[$key] = $val; 
+        } 
+        $stat_list = $c; 
+    } 
+    $stmt->close(); 
+
     db_disconnect();
-    return $row;
+    return $stat_list;
 }
 
 function isNew($uid) {
@@ -420,7 +451,9 @@ function isNew($uid) {
     if (!$stmt->fetch() && $stmt->errno)
         fail('MySQL isNew fetch', $stmt->error);
 
-    $result = $stmt->get_result();
+    // $result = $stmt->get_result();
+    $stmt->bind_result($result);
+    $stmt->fetch();
     if ($result->num_rows === 0) { 
         db_disconnect();
         header('Location: login.php?failed');
@@ -613,6 +646,15 @@ function getClass($uid) {
     return $class_name;
 }
 
+function bind_array($stmt, &$row) {
+    $md = $stmt->result_metadata();
+    $params = array();
+    while($field = $md->fetch_field()) {
+        $params[] = &$row[$field->name];
+    }
+
+    call_user_func_array(array($stmt, 'bind_result'), $params);
+}
 function getClassList() {
     global $db;
     db_connect();
@@ -627,15 +669,31 @@ function getClassList() {
         fail('MySQL getClassList execute', $stmt->error);
 
     // $result = $stmt->get_result();
-    $stmt->bind_result($result);
-    $stmt->fetch();
+    // $stmt->bind_result($result);
+    // $stmt->fetch();
 
-    $class_list = array();
-    while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-        array_push($class_list, $row);
-    }
+    $meta = $stmt->result_metadata(); 
 
-    $result->free();
+    while ($field = $meta->fetch_field()) { 
+        $params[] = &$row[$field->name]; 
+    } 
+
+    call_user_func_array(array($stmt, 'bind_result'), $params);            
+    while ($stmt->fetch()) { 
+        foreach($row as $key => $val) { 
+            $c[$key] = $val; 
+        } 
+        $class_list[] = $c; 
+    } 
+    $stmt->close(); 
+
+    // $class_list = array();
+    // $class_list = $hits;
+    // while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+    //     array_push($class_list, $row);
+    // }
+
+    // $result->free();
     db_disconnect();
     return $class_list;
 }
