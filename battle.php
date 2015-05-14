@@ -2,6 +2,7 @@
 require_once "utils/functions.php";
 
 if( isLogged() && !isNew($_SESSION['uid']) ) {
+  $isBattle = true;
   $profile = getProfile($_SESSION['uid']);
   $stats = getStats($_SESSION['uid']);
   $chara_class = getClass($_SESSION['uid']);
@@ -19,7 +20,10 @@ include_once "header.php";
 ?>
 
 <h1>Battleground</h1>
-<div class="table-responsive">
+<div class="table-responsive battle-wrap">
+  <div class="battle-info">
+    <div id="battle-text">Ready for battle</div>
+  </div>
   <table class="table battle">
     <thead>
       <tr>
@@ -35,23 +39,23 @@ include_once "header.php";
           <?php 
           $battle_total_hp = $stats["hp"] * 10;  
           $battle_hp = $stats["hp"]; 
-          $battle_percent_hp = $stats["hp"] / $stats["hp"] * 100 - 20; 
+          $battle_percent_hp = $stats["hp"] / $stats["hp"] * 100; 
 
           $battle_total_sp = $stats["sp"] * 10;  
           $battle_sp = $stats["sp"]; 
           $battle_percent_sp = $stats["sp"] / $stats["sp"] * 100; 
           ?>
           <div class="progress">
-            <div class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_hp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_hp ?>" style="min-width: 2em; width: <?php echo $battle_percent_hp ?>%">
-              HP <?php echo $battle_hp ?> / <?php echo $battle_total_hp ?>
+            <div id="playerHPbar" class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_hp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_hp ?>" style="min-width: 2em; width: <?php echo $battle_percent_hp ?>%">
+              HP <span id="playerHP"></span> / <?php echo $battle_total_hp ?>
             </div>
           </div>
         </td>
         <td class="battle-monster">
           <img class="center-block img-responsive" src="http://www.cs.csub.edu/~achen/cs311/week09_final/final/monsters/9.png" alt="Avatar" />
           <div class="progress">
-            <div class="progress-bar progress-bar-danger  progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_hp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_hp ?>" style="min-width: 2em; width: 40%">
-              HP <?php echo $battle_hp ?> / <?php echo $battle_total_hp ?>
+            <div id="monsterHPbar" class="progress-bar progress-bar-danger  progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_hp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_hp ?>" style="min-width: 2em; width: 100%">
+              HP <span id="monsterHP"></span> / <?php echo $battle_total_hp ?>
             </div>
           </div>
         </td>
@@ -62,7 +66,7 @@ include_once "header.php";
             <div class="row">
               <div class="col-sm-3">
                 <p>Attack description</p>
-                <a class="btn btn-default btn-block" href="#" role="button">Attack</a>
+                <a class="btn btn-default btn-block" href="#" role="button" onclick="attack(); return false;">Attack</a>
               </div>
               <div class="col-sm-3">
                 <p>Attack description</p>
@@ -90,6 +94,19 @@ include_once "header.php";
   </table>
 </div>
 
+<script type="text/javascript">
+  var myTotalHP=<?php echo $battle_total_hp ?>;
+  var myTotalSP=<?php echo $battle_total_sp ?>;
+  var myCurrentHP = myTotalHP;
+  var myCurrentSP = myTotalSP;
+  document.getElementById('playerHP').innerHTML = myCurrentHP;
+
+  var enemyTotalHP=<?php echo $battle_total_hp ?>;
+  var enemyTotalSP=<?php echo $battle_total_sp ?>;
+  var enemyCurrentHP = enemyTotalHP;
+  var enemyCurrentSP = enemyTotalSP;
+  document.getElementById('monsterHP').innerHTML = myCurrentHP;
+</script>
 
 <?php } // end isLogged()
 else { 

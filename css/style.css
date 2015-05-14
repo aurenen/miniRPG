@@ -46,6 +46,27 @@ div.jumbotron.first {
     height: 25px;
 }
 
+.battle-info {
+    position: absolute;
+    top: 200px;
+    text-align: center;
+    width: 100%;
+}
+#battle-text {
+    margin: auto;
+    padding: 20px 10px;
+    width: 200px;
+    background-color: #eee;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px; /* future proofing */
+    -khtml-border-radius: 10px;    
+}
+
+.battle-wrap {
+    position: relative;
+}
+
 .battle {
     background-image: url('../images/battle_bg.jpg');
     background-size: cover;  
