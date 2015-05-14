@@ -41,12 +41,12 @@ include_once "header.php";
           $battle_hp = $stats["hp"]; 
           $battle_percent_hp = $stats["hp"] / $stats["hp"] * 100; 
 
-          $battle_total_sp = $stats["sp"] * 10;  
+          $battle_total_sp = $stats["sp"];  
           $battle_sp = $stats["sp"]; 
           $battle_percent_sp = $stats["sp"] / $stats["sp"] * 100; 
           ?>
           <div class="progress">
-            <div id="playerHPbar" class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_hp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_hp ?>" style="min-width: 2em; width: <?php echo $battle_percent_hp ?>%">
+            <div id="playerHPbar" class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_hp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_hp ?>" style="min-width: 2em; width: 100%">
               HP <span id="playerHP"></span> / <?php echo $battle_total_hp ?>
             </div>
           </div>
@@ -83,8 +83,8 @@ include_once "header.php";
             </div>
           </div>
           <div class="progress">
-            <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_sp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_sp ?>" style="min-width: 2em; width: <?php echo $battle_percent_sp ?>%">
-              SP <?php echo $battle_sp ?> / <?php echo $battle_total_sp ?>
+            <div id="playerSPbar" class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_sp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_sp ?>" style="min-width: 2em; width: 100%">
+              SP <span id="playerSP"></span> / <?php echo $battle_total_sp ?>
             </div>
           </div>
 
