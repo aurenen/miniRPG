@@ -11,6 +11,7 @@ require_once 'PasswordHash.php';
 
 $db; // global mysqli connection object
 $profile = array(); // global profile array
+$isBattle = false;
 function db_connect() {
     global $db, $db_host, $db_user, $db_pass, $db_name;
     $db = new mysqli($db_host, $db_user, $db_pass, $db_name, 3306);
