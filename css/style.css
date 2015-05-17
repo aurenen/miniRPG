@@ -63,6 +63,28 @@ div.jumbotron.first {
     -khtml-border-radius: 10px;    
 }
 
+#battle-attack-user {
+    position: absolute;
+    top: 30px;
+    left: 10%;
+    width: 30%;
+    height: 300px;
+    background-position: 50% 50%;
+}
+
+#battle-attack-monster {
+    position: absolute;
+    top: 30px;
+    right: 10%;
+    width: 30%;
+    height: 300px;
+    background-position: 50% 50%;
+}
+
+.battle-fire {
+    background-image: url('../images/ani/fire.gif');
+}
+
 .battle-wrap {
     position: relative;
 }

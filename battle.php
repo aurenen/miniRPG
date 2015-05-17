@@ -24,6 +24,10 @@ include_once "header.php";
   <div class="battle-info">
     <div id="battle-text">Ready for battle</div>
   </div>
+  <div id="battle-attack-user">
+  </div>
+  <div id="battle-attack-monster">
+  </div>
   <table class="table battle">
     <thead>
       <tr>
@@ -98,6 +102,7 @@ include_once "header.php";
   var myCurrentHP = myTotalHP;
   var myCurrentSP = myTotalSP;
   document.getElementById('playerHP').innerHTML = myCurrentHP;
+  document.getElementById('playerSP').innerHTML = myCurrentSP;
 
   var enemyTotalHP=<?php echo $battle_total_hp ?>;
   var enemyTotalSP=<?php echo $battle_total_sp ?>;
