@@ -38,7 +38,7 @@ include_once "header.php";
     <tbody>
       <tr>
         <td class="battle-chara">
-          <img class="center-block img-responsive" src="http://placehold.it/200x300" alt="Avatar" />
+          <img class="center-block img-responsive" src="images/ani/char_idle.gif" alt="Avatar" />
 
           <?php 
           $battle_total_hp = $stats["hp"];  
@@ -54,7 +54,7 @@ include_once "header.php";
           </div>
         </td>
         <td class="battle-monster">
-          <img class="center-block img-responsive" src="http://www.cs.csub.edu/~achen/cs311/week09_final/final/monsters/9.png" alt="Avatar" />
+          <img class="center-block img-responsive" src="images/ani/monster_idle.gif" alt="Avatar" />
           <div class="progress">
             <div id="monsterHPbar" class="progress-bar progress-bar-danger  progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_hp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_hp ?>" style="min-width: 2em; width: 100%">
               HP <span id="monsterHP"></span> / <?php echo $battle_total_hp ?>
@@ -67,8 +67,8 @@ include_once "header.php";
           <div class="container-fluid">
             <div class="row">
               <div class="col-sm-3">
-                <p>Attack description</p>
-                <a class="btn btn-default btn-block" href="#" role="button" onclick="attack(); return false;">Attack</a>
+                <p>An elemental move based on magic</p>
+                <a class="btn btn-default btn-block" href="#" role="button" onclick="attack(); return false;">Fire Ball</a>
               </div>
               <div class="col-sm-3">
                 <p>Attack description</p>
