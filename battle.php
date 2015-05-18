@@ -24,6 +24,10 @@ include_once "header.php";
   <div class="battle-info">
     <div id="battle-text">Ready for battle</div>
   </div>
+  <div id="battle-attack-user">
+  </div>
+  <div id="battle-attack-monster">
+  </div>
   <table class="table battle">
     <thead>
       <tr>
@@ -37,13 +41,11 @@ include_once "header.php";
           <img class="center-block img-responsive" src="http://placehold.it/200x300" alt="Avatar" />
 
           <?php 
-          $battle_total_hp = $stats["hp"] * 10;  
+          $battle_total_hp = $stats["hp"];  
           $battle_hp = $stats["hp"]; 
-          $battle_percent_hp = $stats["hp"] / $stats["hp"] * 100; 
 
           $battle_total_sp = $stats["sp"];  
-          $battle_sp = $stats["sp"]; 
-          $battle_percent_sp = $stats["sp"] / $stats["sp"] * 100; 
+          $battle_sp = $stats["sp"];  
           ?>
           <div class="progress">
             <div id="playerHPbar" class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $battle_total_hp ?>" aria-valuemin="0" aria-valuemax="<?php echo $battle_total_hp ?>" style="min-width: 2em; width: 100%">
@@ -100,6 +102,7 @@ include_once "header.php";
   var myCurrentHP = myTotalHP;
   var myCurrentSP = myTotalSP;
   document.getElementById('playerHP').innerHTML = myCurrentHP;
+  document.getElementById('playerSP').innerHTML = myCurrentSP;
 
   var enemyTotalHP=<?php echo $battle_total_hp ?>;
   var enemyTotalSP=<?php echo $battle_total_sp ?>;
