@@ -5,6 +5,10 @@ session_regenerate_id(true);
 require_once 'config.php';
 require_once 'PasswordHash.php';
 
+ini_set('display_errors',1);  
+error_reporting(E_ALL);
+mysqli_report(MYSQLI_REPORT_STRICT);
+
 /*****************************************
     Database Related Functions
 *****************************************/
@@ -77,6 +81,7 @@ function createMonster() {
 
         $fp++;
     }
+    fclose($fp);
 
     $hp; $sp; $str; $vit; $dex; $agi; $cun; $wis; $exp = 50;
     // stats start out from a total of 30 points (avg of 5 pts * 6 areas)
@@ -119,6 +124,45 @@ function createMonster() {
             db_disconnect();
         }
     } // end for
+}
+
+
+/*****************************************
+    Battle Functions
+*****************************************/
+
+function gainExp($uid) {
+    $old = getExp($uid);
+    $level = getLevel($uid);
+    
+    global $db;
+    db_connect();
+
+    $exp = $level * rand(5, 15) + $old;
+
+    $sql = "UPDATE stats SET exp=? WHERE id=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL gainExp prepare', $stmt->error);
+    if (!$stmt->bind_param('ii', $exp, $uid))
+        fail('MySQL gainExp bind_param', $db->error);
+    if (!$stmt->execute()) {
+        $stmt->close();
+
+        fail('MySQL gainExp execute', $db->error);
+        db_disconnect();
+
+        header('Location: index.php?error');
+        exit();
+    }
+    else {
+        $stmt->close();
+        db_disconnect();
+        header('Location: battle.php?exp');
+        exit();
+    }
 }
 
 /*****************************************
@@ -328,13 +372,63 @@ function getCharacterName($uid) {
     // $result = $stmt->get_result();
     $stmt->bind_result($result);
     $stmt->fetch();
-    if ($result->num_rows === 0) { 
-        db_disconnect();
-        header('Location: login.php?failed');
-        exit();
-    }
+
     db_disconnect();
     return $name;
+}
+
+function getLevel($uid) {
+    global $db;
+    db_connect();
+
+    $sql = "SELECT level FROM users WHERE uid=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getLevel prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getLevel bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getLevel execute', $stmt->error);
+    if (!$stmt->bind_result($lvl))
+        fail('MySQL getLevel bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL getLevel fetch', $stmt->error);
+
+    // $result = $stmt->get_result();
+    $stmt->bind_result($result);
+    $stmt->fetch();
+
+    db_disconnect();
+    return $lvl;
+}
+
+function getExp($uid) {
+    global $db;
+    db_connect();
+
+    $sql = "SELECT exp FROM stats WHERE id=?";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL getExp prepare', $stmt->error);
+    if (!$stmt->bind_param('i', $uid))
+        fail('MySQL getExp bind_param', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getExp execute', $stmt->error);
+    if (!$stmt->bind_result($exp))
+        fail('MySQL getExp bind_result', $stmt->error);
+    if (!$stmt->fetch() && $stmt->errno)
+        fail('MySQL getExp fetch', $stmt->error);
+
+    // $result = $stmt->get_result();
+    $stmt->bind_result($result);
+    $stmt->fetch();
+
+    db_disconnect();
+    return $exp;
 }
 
 function getProfile($uid) {
@@ -455,11 +549,7 @@ function isNew($uid) {
     // $result = $stmt->get_result();
     $stmt->bind_result($result);
     $stmt->fetch();
-    if ($result->num_rows === 0) { 
-        db_disconnect();
-        header('Location: login.php?failed');
-        exit();
-    }
+
     db_disconnect();
     return $flag;
 }
@@ -638,11 +728,7 @@ function getClass($uid) {
     // $result = $stmt->get_result();
     $stmt->bind_result($result);
     $stmt->fetch();
-    if ($result->num_rows === 0) { 
-        db_disconnect();
-        header('Location: login.php?failed');
-        exit();
-    }
+
     db_disconnect();
     return $class_name;
 }
