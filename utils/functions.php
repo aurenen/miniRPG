@@ -683,11 +683,6 @@ function setClass($uid, $type) {
     if (!$stmt->bind_param('iii', $type, $new, $uid))
         fail('MySQL setClass bind_param', $db->error);
     if (!$stmt->execute()) {
-    /* Figure out why this failed - maybe the username is already taken?
-     * It could be more reliable/portable to issue a SELECT query here.  We would
-     * definitely need to do that (or at least include code to do it) if we were
-     * supporting multiple kinds of database backends, not just MySQL.  However,
-     * the prepared statements interface we're using is MySQL-specific anyway. */
         $stmt->close();
 
         fail('MySQL setClass execute', $db->error);
@@ -726,8 +721,8 @@ function getClass($uid) {
         fail('MySQL getClass fetch', $stmt->error);
 
     // $result = $stmt->get_result();
-    $stmt->bind_result($result);
-    $stmt->fetch();
+    // $stmt->bind_result($result);
+    // $stmt->fetch();
 
     db_disconnect();
     return $class_name;
