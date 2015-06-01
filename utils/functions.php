@@ -106,11 +106,6 @@ function createMonster() {
         if (!$stmt->bind_param('iiiiiiiiii', $mid, $exp, $hp, $sp, $str, $vit, $dex, $agi, $cun, $wis))
             fail('MySQL createMonster bind_param', $db->error);
         if (!$stmt->execute()) {
-        /* Figure out why this failed - maybe the username is already taken?
-         * It could be more reliable/portable to issue a SELECT query here.  We would
-         * definitely need to do that (or at least include code to do it) if we were
-         * supporting multiple kinds of database backends, not just MySQL.  However,
-         * the prepared statements interface we're using is MySQL-specific anyway. */
             $stmt->close();
 
             fail('MySQL createMonster execute', $db->error);
@@ -158,7 +153,7 @@ function gainExp($uid) {
             fail('MySQL levelUp execute', $db->error);
             db_disconnect();
 
-            header('Location: index.php?error');
+            header('Location: index.php?lvlerror');
             exit();
         }
         else {
@@ -181,7 +176,7 @@ function gainExp($uid) {
         fail('MySQL gainExp execute', $db->error);
         db_disconnect();
 
-        header('Location: index.php?error');
+        header('Location: index.php?experror');
         exit();
     }
     else {
@@ -217,8 +212,6 @@ function registerAccount($email, $pass, $chara, $gender) {
         header('Location: register.php?invalid_password');
         exit();
     }
-
-    // mysqli_report(MYSQLI_REPORT_ALL);
     
     // check if email already registered
     $sql = "SELECT * FROM users WHERE email=?";
@@ -307,7 +300,7 @@ function login($user, $pass) {
     $stmt->bind_result($result);
     $stmt->fetch();
 
-    if ($result->num_rows === 0) { 
+    if (!isset($result)) { 
         header('Location: login.php?failed');
         exit();
     }
@@ -365,22 +358,6 @@ function getCharacterName($uid) {
     global $db;
     db_connect();
 
-    // check if uid exists
-    // $sql = "SELECT * FROM users WHERE uid=?";
-
-    // $stmt = $db->prepare($sql);
-    // $stmt->bind_param('i', $uid);
-
-    // $stmt->execute();
-    // $result = $stmt->get_result();
-    // $result->fetch_row();
-
-    // if ($result->num_rows === 0) { 
-    //     header('Location: profile.php?uid=failed');
-    //     exit();
-    // }
-    // $stmt->close();
-
     $sql = "SELECT character_name FROM users WHERE uid=?";
 
     $stmt = $db->prepare($sql);
@@ -397,8 +374,8 @@ function getCharacterName($uid) {
         fail('MySQL getCharacterName fetch', $stmt->error);
 
     // $result = $stmt->get_result();
-    $stmt->bind_result($result);
-    $stmt->fetch();
+    // $stmt->bind_result($result);
+    // $stmt->fetch();
 
     db_disconnect();
     return $name;
@@ -423,10 +400,6 @@ function getLevel($uid) {
     if (!$stmt->fetch() && $stmt->errno)
         fail('MySQL getLevel fetch', $stmt->error);
 
-    // $result = $stmt->get_result();
-    $stmt->bind_result($result);
-    $stmt->fetch();
-
     db_disconnect();
     return $lvl;
 }
@@ -449,10 +422,6 @@ function getExp($uid) {
         fail('MySQL getExp bind_result', $stmt->error);
     if (!$stmt->fetch() && $stmt->errno)
         fail('MySQL getExp fetch', $stmt->error);
-
-    // $result = $stmt->get_result();
-    $stmt->bind_result($result);
-    $stmt->fetch();
 
     db_disconnect();
     return $exp;
