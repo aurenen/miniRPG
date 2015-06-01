@@ -63,16 +63,7 @@ div.jumbotron.first {
     -khtml-border-radius: 10px;    
 }
 
-#battle-attack-user {
-    position: absolute;
-    top: 30px;
-    left: 10%;
-    width: 30%;
-    height: 300px;
-    background-position: 50% 50%;
-}
-
-#battle-attack-monster {
+#battle-attack-user,#battle-attack-monster {
     position: absolute;
     top: 30px;
     right: 10%;
@@ -90,14 +81,15 @@ div.jumbotron.first {
 }
 
 .battle {
-    background-image: url('../images/battle_bg.jpg');
+    background-image: url('../images/battle_bg.png');
     background-size: cover;  
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
 }
 .battle-chara img {
-    height: 300px;
+    height: 160px;
+    margin-top: 140px;
     /*background-color: #ddd;*/
 }
 
