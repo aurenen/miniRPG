@@ -74,10 +74,10 @@ include_once "header.php";
                 <abbr title="Health Points">HP</abbr> : <?php echo $stats["hp"] ?> / 
                 <abbr title="Skill Points">SP</abbr> : <?php echo $stats["sp"] ?>
                 <hr class="clear">
-                <abbr title="Experience">EXP</abbr> : <?php echo $stats["exp"] ?> / 100
+                <abbr title="Experience">EXP</abbr> : <?php echo $stats["exp"] ?> / <?php echo getMaxExp($profile["level"]); ?>
                 <div class="progress">
-                  <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="<?php echo $stats["exp"] ?>" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
-                    <?php echo $stats["exp"] ?>%
+                  <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="<?php echo $stats["exp"] ?>" aria-valuemin="0" aria-valuemax="<?php echo $stats["exp"] ?>" style="min-width: 2em; width:<?php echo round($stats["exp"] / getMaxExp($profile["level"]), 1) * 100; ?>%">
+                     <?php echo round($stats["exp"] / getMaxExp($profile["level"]), 1) * 100; ?>%
                   </div>
                 </div>
                 <abbr title="Strength">STR</abbr> : <?php echo $stats["str"] ?> / 

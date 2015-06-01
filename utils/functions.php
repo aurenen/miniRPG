@@ -134,11 +134,38 @@ function createMonster() {
 function gainExp($uid) {
     $old = getExp($uid);
     $level = getLevel($uid);
-    
+
     global $db;
     db_connect();
 
-    $exp = $level * rand(5, 15) + $old;
+    $exp = ceil($level * 0.65 * 2.5 + rand(5, 15) * 1.4) + $old;
+
+    if ($exp >= getMaxExp($level)) {
+        // level up and recalculate exp
+        $nlvl = $level + 1;
+
+        $sql = "UPDATE users SET level=? WHERE uid=?";
+
+        $stmt = $db->prepare($sql);
+
+        if (!$stmt) 
+            fail('MySQL levelUp prepare', $db->error);
+        if (!$stmt->bind_param('ii', $nlvl, $uid))
+            fail('MySQL levelUp bind_param', $db->error);
+        if (!$stmt->execute()) {
+            $stmt->close();
+
+            fail('MySQL levelUp execute', $db->error);
+            db_disconnect();
+
+            header('Location: index.php?error');
+            exit();
+        }
+        else {
+            $stmt->close();
+            $exp = $exp - getMaxExp($level);
+        }
+    }
 
     $sql = "UPDATE stats SET exp=? WHERE id=?";
 
@@ -429,6 +456,10 @@ function getExp($uid) {
 
     db_disconnect();
     return $exp;
+}
+
+function getMaxExp($level) {
+    return floor(hypot($level * 15,$level * 20) * 2.1);
 }
 
 function getProfile($uid) {

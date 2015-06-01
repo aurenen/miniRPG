@@ -18,7 +18,7 @@ if( isLogged() && !isNew($_SESSION['uid']) ) {
   else {
     $url = $_GET;
   }
-  if(($_SERVER["REQUEST_METHOD"] == "POST") && isset($_SESSION['token']) && ($_POST['token'] == $_SESSION['token'])) {
+  if(($_SERVER["REQUEST_METHOD"] == "POST") /*&& isset($_SESSION['token']) && ($_POST['token'] == $_SESSION['token'])*/) {
     gainExp($_SESSION['uid']);
   }
 
@@ -94,6 +94,12 @@ include_once "header.php";
       </tr>
     </tbody>
   </table>
+  <?php echo getExp($_SESSION['uid']) . "/" . getMaxExp($profile["level"]); ?>
+  <div class="progress">
+    <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $stats["exp"] ?>" aria-valuemin="0" aria-valuemax="<?php echo $stats["exp"] ?>" style="min-width: 2em; width:<?php echo round($stats["exp"] / getMaxExp($profile["level"]), 1) * 100; ?>%">
+      <?php echo round($stats["exp"] / getMaxExp($profile["level"]), 1) * 100; ?>%
+    </div>
+  </div>
 </div>
 
 <script type="text/javascript">
