@@ -10,5 +10,5 @@ For senior sem
 *  ~~Generate stats based on class, increase points as you level up~~
 *  ~~Edit Profile~~
 *  Level Rankings
-*  Battle System
-*  Experience and Loot
+*  ~~Battle System~~
+*  ~~Experience~~ and Loot
