@@ -187,7 +187,7 @@ function gainExp($uid) {
     else {
         $stmt->close();
         db_disconnect();
-        header('Location: battle.php?exp');
+        header('Location: battle.php');
         exit();
     }
 }
