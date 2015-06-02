@@ -9,6 +9,6 @@ For senior sem
 *  ~~Select character class after registration~~
 *  ~~Generate stats based on class, increase points as you level up~~
 *  ~~Edit Profile~~
-*  Level Rankings
+*  ~~Level Rankings~~
 *  ~~Battle System~~
 *  ~~Experience~~ and Loot
