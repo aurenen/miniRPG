@@ -2,6 +2,8 @@ function spcost(points)
 {
   if (myCurrentSP > 0)
     myCurrentSP -= points;
+  if (myCurrentSP < 0)
+    myCurrentSP = 0;
   // else
   //   alert("You ran out of SP!");
   document.getElementById('playerSP').innerHTML = myCurrentSP;
