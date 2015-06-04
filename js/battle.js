@@ -8,33 +8,45 @@ function spcost(points)
   document.getElementById('playerSPbar').style.width = myCurrentSP / myTotalSP * 100 + "%";
 }
 
-function attackanimation(name)
+function dodge(atk, def)
 {
-  document.getElementById(name).className = "battle-fire";
+  atk = (Math.floor(Math.random() * 10) + 1) + atk - Math.floor(Math.random() * 10);
+  def = (Math.floor(Math.random() * 10) + 1) + def - Math.floor(Math.random() * 10);
+  if (def >= atk)
+    return true;
+  else
+    return false;
+}
+
+function attackanimation(name, type)
+{
+  document.getElementById(name).className = "battle-" + type;
   setTimeout(function(){document.getElementById(name).className = ""}, 1000);
 }
 
-function enemyattack()
+function enemyattack(m)
 {
-  document.getElementById("battle-enemy").src="images/ani/no_repeat.gif";
-  setTimeout(function(){document.getElementById("battle-enemy").src="images/ani/monster_idle.gif"}, 1000);
+  document.getElementById("battle-enemy").src="images/ani/monster" + m + "_attack.gif";
+  setTimeout(function(){document.getElementById("battle-enemy").src="images/ani/monster" + m + "_idle.gif"}, 1000);
 }
 
 function enemy()
 {
-  var dmg = Math.floor((Math.random())*10); // [1-10]
-  if (myCurrentHP > 0)
-    myCurrentHP -= dmg;
+  var dmg = Math.floor(((Math.random())*10) * myLevel); // [1-10]
+  if (myCurrentHP > 0) {
+    if (!dodge(enemyAtk, myDef))
+      myCurrentHP -= dmg;
+  }
   if (myCurrentHP < 0) myCurrentHP = 0;
   document.getElementById('playerHP').innerHTML = myCurrentHP;
   document.getElementById('playerHPbar').style.width= myCurrentHP / myTotalHP * 100 + "%";
 
-  if (dmg == 0)
+  if (dodge(enemyAtk, myDef) || dmg == 0)
     document.getElementById('battle-text').innerHTML = "<b>You</b> dodged!";
   else {
     document.getElementById('battle-text').innerHTML = "<b>You</b> are hit for " + dmg + " hp";
-    // attackanimation('battle-attack-user');
-    enemyattack();
+    attackanimation('battle-attack-user', 'slash');
+    enemyattack(enemyId);
   }
   document.getElementById('battle-text').style.background = "Tomato";
 
@@ -45,25 +57,32 @@ function enemy()
 }
 
 function attack(factor) {
-  var dmg = (Math.floor((Math.random())*10) + 1) * factor; // [1-10]
+  var dmg = Math.floor(((Math.random())*10) + 1 * factor * myLevel); // [1-10]
   if (enemyCurrentHP > 0) {
-    enemyCurrentHP -= dmg;
-    spcost(5);
+    spcost(5 * factor);
+    if (myCurrentSP <= 0) {
+      alert("Out of SP!");
+      myCurrentSP = 0;
+    }
+    else if (!dodge(myAtk, enemyDef))
+      enemyCurrentHP -= dmg;
   }
   if (enemyCurrentHP < 0) enemyCurrentHP = 0;
-  document.getElementById("battle-user").src="images/ani/ranger_attack.gif";
-  setTimeout(function(){document.getElementById("battle-user").src="images/ani/ranger_idle.gif"}, 1000);
+  document.getElementById("battle-user").src="images/ani/" + myClass + "_attack.gif";
+  setTimeout(function(){document.getElementById("battle-user").src="images/ani/" + myClass + "_idle.gif"}, 1000);
 
   document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
-  document.getElementById('monsterHPbar').style.width= enemyCurrentHP / myTotalHP * 100 + "%";
+  document.getElementById('monsterHPbar').style.width= enemyCurrentHP / enemyTotalHP * 100 + "%";
 
-  if (dmg == 0)
-    document.getElementById('battle-text').innerHTML = "<b>Enemy</b> dodged!";
-  else {
-    document.getElementById('battle-text').innerHTML = "<b>Enemy</b> hit for " + dmg + " hp";
-    attackanimation('battle-attack-monster');
+  if (myCurrentSP > 0) {
+    if (dodge(myAtk, enemyDef) || dmg == 0)
+      document.getElementById('battle-text').innerHTML = "<b>Enemy</b> dodged!";
+    else {
+      document.getElementById('battle-text').innerHTML = "<b>Enemy</b> hit for " + dmg + " hp";
+      attackanimation('battle-attack-monster', 'fire');
+    }
+    document.getElementById('battle-text').style.background = "SpringGreen";
   }
-  document.getElementById('battle-text').style.background = "SpringGreen";
 
   if (enemyCurrentHP == 0) {
     alert("You win!");
@@ -76,10 +95,17 @@ function attack(factor) {
 
 function recoverhp()
 {
-  myCurrentHP += myTotalHP * .2;
-  if (myCurrentHP > myTotalHP) myCurrentHP = myTotalHP;
-  document.getElementById('playerHP').innerHTML = myCurrentHP;
-  document.getElementById('playerHPbar').style.width= myCurrentHP / myTotalHP * 100 + "%";
+  spcost(5);
+  if (myCurrentSP <= 0) {
+    alert("Out of SP!");
+    myCurrentSP = 0;
+  }
+  else {
+    myCurrentHP += myTotalHP * .2;
+    if (myCurrentHP > myTotalHP) myCurrentHP = myTotalHP;
+    document.getElementById('playerHP').innerHTML = myCurrentHP;
+    document.getElementById('playerHPbar').style.width= myCurrentHP / myTotalHP * 100 + "%";
+  }
   setTimeout(enemy, 1000);
 }
 

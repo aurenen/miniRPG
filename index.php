@@ -1,7 +1,7 @@
 <?php
 require_once "utils/functions.php";
 include "header.php";
-if( isLogged() ) {
+if( isLogged() ) :
 ?>
 
 <?php if ( isNew($_SESSION['uid']) ): ?>
@@ -12,16 +12,22 @@ if( isLogged() ) {
   <p><a class="btn btn-default btn-lg" href="selectclass.php" role="button">Select Your Class</a></p>
 </div>
 
-<?php endif ?>
+<?php endif; // isNew ?>
 
 <h1>Welcome!</h1>
 <p>Successfully logged in.</p>
 
 
 
-<?php } else { ?>
+<?php else: ?>
 
 <h1>Welcome!</h1>
 <p>Logged out, please log in or register for an account.</p>
 
-<?php } include_once "footer.php"; ?>
+<?php endif; ?>
+<p>
+    <?php echo $site_title; ?> is currently in alpha testing, if you would like to sign up for the closed beta, please 
+    <a href="http://eepurl.com/bf_sOL">sign up for the mailing list</a>, and when it's ready you'll be notified.
+</p>
+
+<?php include_once "footer.php"; ?>

@@ -5,9 +5,9 @@ session_regenerate_id(true);
 require_once 'config.php';
 require_once 'PasswordHash.php';
 
-ini_set('display_errors',1);  
-error_reporting(E_ALL);
-mysqli_report(MYSQLI_REPORT_STRICT);
+// ini_set('display_errors',1);  
+// error_reporting(E_ALL);
+// mysqli_report(MYSQLI_REPORT_STRICT);
 
 /*****************************************
     Database Related Functions
@@ -61,6 +61,18 @@ function cleanSQL($val) {
     return $db->real_escape_string($val);
 }
 
+function userCount() {
+    global $db;
+    db_connect();
+
+    if ($result = $db->query("SELECT uid FROM users")) {
+        $count = $result->num_rows;
+
+        $result->close();
+    }
+    db_disconnect();
+    return $count;
+}
 
 /*****************************************
     Monster Functions
@@ -185,6 +197,45 @@ function gainExp($uid) {
         header('Location: battle.php');
         exit();
     }
+}
+
+function getRanking() {
+    global $db;
+    db_connect();
+
+    $sql = "SELECT users.uid, users.character_name, users.level, users.money, stats.exp, classes.type FROM users 
+            INNER JOIN classes ON classes.cid = users.character_class
+            INNER JOIN stats ON users.uid = stats.id 
+            ORDER BY users.level DESC, stats.exp DESC";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt) 
+        fail('MySQL gainExp prepare', $stmt->error);
+    if (!$stmt->execute())
+        fail('MySQL getProfile execute', $stmt->error);
+
+    // $meta = $stmt->result_metadata(); 
+
+    // while ($field = $meta->fetch_field()) { 
+    //     $params[] = &$row[$field->name]; 
+    // } 
+
+    // call_user_func_array(array($stmt, 'bind_result'), $params);            
+    // while ($stmt->fetch()) { 
+    //     foreach($row as $key => $val) { 
+    //         $c[$key] = $val; 
+    //     } 
+    //     $ranking = $c; 
+    // }
+
+    $result = $stmt->get_result();
+    // $stmt->fetch();
+    $ranking = $result->fetch_all(MYSQLI_ASSOC);
+    $result->free(); 
+    $stmt->close();
+    db_disconnect();
+    return $ranking;
 }
 
 /*****************************************
@@ -487,10 +538,11 @@ function getProfile($uid) {
 }
 
 function getStats($uid) {
+    $level = getLevel($uid);
     global $db;
     db_connect();
 
-    $sql = "SELECT exp, hp, sp, str, vit, dex, agi, cun, wis FROM users, stats WHERE id=?";
+    $sql = "SELECT hp, sp, str, vit, dex, agi, cun, wis FROM users, stats WHERE id=?";
 
     $stmt = $db->prepare($sql);
 
@@ -516,7 +568,7 @@ function getStats($uid) {
     call_user_func_array(array($stmt, 'bind_result'), $params);            
     while ($stmt->fetch()) { 
         foreach($row as $key => $val) { 
-            $c[$key] = $val; 
+            $c[$key] = $val * $level; 
         } 
         $stat_list = $c; 
     } 
@@ -568,6 +620,8 @@ function setStats($uid, $type) {
     define("ROG", 6);
 
     $hp; $sp; $str; $vit; $dex; $agi; $cun; $wis; $exp = 0;
+    if (!isNew($uid))
+        $exp = getExp($uid);
     // stats start out from a total of 30 points (avg of 5 pts * 6 areas)
     switch ($type) {
         case WAR:
@@ -847,11 +901,6 @@ function updateName($uid, $pass, $name) {
         if (!$stmt->bind_param('si', $name, $uid))
             fail('MySQL updateName bind_param', $db->error);
         if (!$stmt->execute()) {
-        /* Figure out why this failed - maybe the username is already taken?
-         * It could be more reliable/portable to issue a SELECT query here.  We would
-         * definitely need to do that (or at least include code to do it) if we were
-         * supporting multiple kinds of database backends, not just MySQL.  However,
-         * the prepared statements interface we're using is MySQL-specific anyway. */
             $stmt->close();
 
             fail('MySQL setClass execute', $db->error);
@@ -935,6 +984,8 @@ function updateClass($uid, $pass, $class) {
         }
         else { // success
             $stmt->close();
+            // update stats to new class
+            // setStats($uid, $class);
             db_disconnect();
         }
     } 

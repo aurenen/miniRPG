@@ -65,12 +65,13 @@ include_once 'header.php';
             <div class="row">
 
             <div class="col-sm-5 col-sm-push-7">
-              <h3>Guidelines</h3>
+              <h3>Guidelines / Terms</h3>
               <ol>
-                <li><p>Sample</p></li>
-                <li><p>Sample</p></li>
-                <li><p>Sample</p></li>
-                <li><p>Sample</p></li>
+                <li><p>This is an alpha testing phase, so functionality is still pretty basic.</p></li>
+                <li><p>There's no guarantee that your account info will be ported to the beta later.</p></li>
+                <li><p>Much of the gameplay and available options are still open to suggestions.</p></li>
+                <li><p>There is no password recovery, so please don't forget your password.</p></li>
+                <li><p>While the gender option is available, it is not yet implemented.</p></li>
               </ol>
             </div>
 

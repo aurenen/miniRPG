@@ -5,7 +5,22 @@ if( isLogged() && !isNew($_SESSION['uid']) ) {
   $isBattle = true;
   $profile = getProfile($_SESSION['uid']);
   $stats = getStats($_SESSION['uid']);
-  $chara_class = getClass($_SESSION['uid']);
+  $user_atk = floor(($stats["str"] + $stats["dex"] / 5) + ($stats["int"] / 3) + ($profile["level"] / 4));
+  $user_def = floor(($stats["agi"] * 0.35) + max($stats["vit"] * 0.3, (pow($stats["vit"], 2) / 170) - 1) + ($stats["wis"] * 0.25));
+  $chara_class = strtolower(getClass($_SESSION['uid']));
+  $user_exp = getExp($_SESSION['uid']);
+  $class_num = $profile["character_class"] - 1;
+  $monster_id = rand(1,3);
+
+  $skills = array
+    (
+    array("Smash","Charge"),
+    array("Fire Ball","Flame Blast"),
+    array("Sharp Shooting","Explosive Arrows"),
+    array("Charge","Impale"),
+    array("Holy Nova","Seal of Light"),
+    array("Backstab","Cloak and Dagger"),
+    );
 
   $token = md5(uniqid(rand(),true));
   $_SESSION['token'] = $token;
@@ -38,14 +53,14 @@ include_once "header.php";
   <table class="table battle">
     <thead>
       <tr>
-        <th><?php echo $profile["character_name"]; ?></th>
-        <th width="50%">Monster Name</th>
+        <th class="battle-chara-name"><?php echo $profile["character_name"] . " lvl " . $profile["level"]; ?></th>
+        <th width="50%"><?php echo "" ?></th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="battle-chara">
-          <img id="battle-user" class="center-block img-responsive" src="images/ani/ranger_idle.gif" alt="Avatar" />
+          <img id="battle-user" class="center-block img-responsive" src="images/ani/<?php echo $chara_class ?>_idle.gif" alt="Avatar" />
 
           <div class="progress">
             <div id="playerHPbar" class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $stats["hp"] ?>" aria-valuemin="0" aria-valuemax="<?php echo $stats["hp"] ?>" style="min-width: 2em; width: 100%">
@@ -54,10 +69,10 @@ include_once "header.php";
           </div>
         </td>
         <td class="battle-monster">
-          <img id="battle-enemy" class="center-block img-responsive" src="images/ani/monster_idle.gif" alt="Avatar" />
+          <img id="battle-enemy" class="center-block img-responsive" src="images/ani/monster<?php echo $monster_id ?>_idle.gif" alt="Avatar" />
           <div class="progress">
             <div id="monsterHPbar" class="progress-bar progress-bar-danger  progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $stats["hp"] ?>" aria-valuemin="0" aria-valuemax="<?php echo $stats["hp"] ?>" style="min-width: 2em; width: 100%">
-              HP <span id="monsterHP"></span> / <?php echo $stats["hp"] ?>
+              HP <span id="monsterHP"></span> / <span id="monsterHPtotal"></span>
             </div>
           </div>
         </td>
@@ -68,19 +83,19 @@ include_once "header.php";
             <div class="row">
               <div class="col-sm-3">
                 <p>An elemental move based on magic</p>
-                <a class="btn btn-default btn-block" href="#" role="button" onclick="attack(1); return false;">Fire Ball</a>
+                <a class="btn btn-default btn-block" href="#" role="button" onclick="attack(1); return false;"><?php echo $skills[$class_num][0] ?> (5 SP)</a>
               </div>
               <div class="col-sm-3">
                 <p>Restore half of your Skill Points</p>
-                <a class="btn btn-default btn-block" href="#" role="button" onclick="recoversp(); return false;">SP Recovery</a>
+                <a class="btn btn-default btn-block" href="#" role="button" onclick="recoversp(); return false;">SP Recovery (0 SP)</a>
               </div>
               <div class="col-sm-3">
                 <p>An elemental move based on magic</p>
-                <a class="btn btn-default btn-block" href="#" role="button" onclick="attack(2); return false;">Flame Blast</a>
+                <a class="btn btn-default btn-block" href="#" role="button" onclick="attack(2); return false;"><?php echo $skills[$class_num][1] ?> (10 SP)</a>
               </div>
               <div class="col-sm-3">
                 <p>Restore a portion of your Health</p>
-                <a class="btn btn-default btn-block" href="#" role="button" onclick="recoverhp(); return false;">HP Recovery</a>
+                <a class="btn btn-default btn-block" href="#" role="button" onclick="recoverhp(); return false;">HP Recovery  (5 SP)</a>
               </div>
             </div>
           </div>
@@ -94,28 +109,35 @@ include_once "header.php";
       </tr>
     </tbody>
   </table>
-  <?php echo getExp($_SESSION['uid']) . "/" . getMaxExp($profile["level"]); ?>
+  EXP <?php echo getExp($_SESSION['uid']) . "/" . getMaxExp($profile["level"]); ?>
   <div class="progress">
-    <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $stats["exp"] ?>" aria-valuemin="0" aria-valuemax="<?php echo $stats["exp"] ?>" style="min-width: 2em; width:<?php echo round($stats["exp"] / getMaxExp($profile["level"]), 1) * 100; ?>%">
-      <?php echo round($stats["exp"] / getMaxExp($profile["level"]), 1) * 100; ?>%
+    <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $stats["exp"] ?>" aria-valuemin="0" aria-valuemax="<?php echo $stats["exp"] ?>" style="min-width: 2em; width:<?php echo round($user_exp / getMaxExp($profile["level"]), 3) * 100; ?>%">
+      <?php echo round($user_exp / getMaxExp($profile["level"]), 3) * 100; ?>%
     </div>
   </div>
 </div>
 
 <script type="text/javascript">
-  var myLevel=<?php echo $profile["level"] ?>;
-  var myTotalHP=<?php echo $stats["hp"] ?>;
-  var myTotalSP=<?php echo $stats["sp"] ?>;
+  var myClass = "<?php echo $chara_class ?>";
+  var myLevel = <?php echo $profile["level"] ?>;
+  var myAtk = <?php echo $user_atk ?> * myLevel * 0.35;
+  var myDef = <?php echo $user_def ?> * myLevel * 0.35;
+  var myTotalHP = <?php echo $stats["hp"] ?>;
+  var myTotalSP = <?php echo $stats["sp"] ?>;
   var myCurrentHP = myTotalHP;
   var myCurrentSP = myTotalSP;
   document.getElementById('playerHP').innerHTML = myCurrentHP;
   document.getElementById('playerSP').innerHTML = myCurrentSP;
 
-  var enemyTotalHP=<?php echo $stats["hp"] ?>;
-  var enemyTotalSP=<?php echo $stats["sp"] ?>;
+  var enemyId = <?php echo $monster_id ?>;
+  var enemyAtk = <?php echo floor($user_atk * rand(7, 11) * 0.1) ?> * myLevel * 0.37;
+  var enemyDef = <?php echo floor($user_def * rand(7, 11) * 0.1) ?> * myLevel * 0.33;
+  var enemyTotalHP = Math.floor(<?php echo $stats["hp"] ?> * (Math.random() * (1 - 0.75) + 0.75));
+  var enemyTotalSP = <?php echo $stats["sp"] ?>;
   var enemyCurrentHP = enemyTotalHP;
   var enemyCurrentSP = enemyTotalSP;
-  document.getElementById('monsterHP').innerHTML = myCurrentHP;
+  document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
+  document.getElementById('monsterHPtotal').innerHTML = enemyTotalHP;
 </script>
 <form role="form" action="battle.php" method="post" id="battle-play">
   <input type="hidden" name="token" value="<?php echo $token; ?>">

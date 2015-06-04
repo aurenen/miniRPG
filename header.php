@@ -35,8 +35,8 @@
         <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="index.php">Home</a></li>
-          <li><a href="#">Rankings</a></li>
-          <li><a href="#">Marketplace</a></li>
+          <li><a href="ranking.php">Rankings</a></li>
+          <!-- <li><a href="#">Marketplace</a></li> -->
           <li><a href="battle.php">Battleground</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><?php echo getCharacterName($_SESSION['uid']); ?> <span class="caret"></span></a>

@@ -58,7 +58,7 @@ include_once "header.php";
   <?php } ?>
     <div class="col-sm-4">
       <div class="profile-avatar">
-        <img class="center-block" src="http://placehold.it/200x300" alt="Avatar" />
+        <img class="center-block" src="images/ani/<?php echo strtolower($chara_class) ?>_idle.gif" alt="Avatar" />
       </div>
     </div>
     <form class="form-horizontal" role="form" action="settings.php" method="post">

@@ -18,7 +18,7 @@ if( isLogged() && isNew($_SESSION['uid']) ) {
   elseif(isset($_POST['class_mystic'])) {
     setClass($_SESSION['uid'], 5);
   }
-  elseif(isset($_POST['class_ranger'])) {
+  elseif(isset($_POST['class_rogue'])) {
     setClass($_SESSION['uid'], 6);
   }
 

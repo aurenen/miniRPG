@@ -52,6 +52,11 @@ div.jumbotron.first {
     text-align: center;
     width: 100%;
 }
+
+th.battle-chara-name {
+    text-align: center;
+}
+
 #battle-text {
     margin: auto;
     padding: 20px 10px;
@@ -63,17 +68,36 @@ div.jumbotron.first {
     -khtml-border-radius: 10px;    
 }
 
-#battle-attack-user,#battle-attack-monster {
+#battle-attack-user {
+    position: absolute;
+    top: 30px;
+    left: 10%;
+    width: 30%;
+    height: 300px;
+}
+
+#battle-attack-monster {
     position: absolute;
     top: 30px;
     right: 10%;
     width: 30%;
     height: 300px;
-    background-position: 50% 50%;
 }
 
 .battle-fire {
     background-image: url('../images/ani/fire.gif');
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+}
+.battle-cut {
+    background-image: url('../images/ani/cut.gif');
+    background-position: center bottom;
+    background-repeat: no-repeat;
+}
+.battle-slash {
+    background-image: url('../images/ani/slash.gif');
+    background-position: center bottom;
+    background-repeat: no-repeat;
 }
 
 .battle-wrap {
