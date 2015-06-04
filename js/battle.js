@@ -63,13 +63,14 @@ function attack(factor) {
   var dmg = Math.floor(((Math.random())*10) + 1 * factor * myLevel); // [1-10]
   if (dodge(myAtk, enemyDef)) dmg = 0;
   if (enemyCurrentHP > 0) {
-    spcost(5 * factor);
     if (myCurrentSP <= 0) {
       alert("Out of SP!");
       myCurrentSP = 0;
     }
-    else if (!dodge(myAtk, enemyDef))
+    else if (!dodge(myAtk, enemyDef)) {
+      spcost(5 * factor);
       enemyCurrentHP -= dmg;
+    }
   }
   if (enemyCurrentHP < 0) enemyCurrentHP = 0;
   if (!dodge(myAtk, enemyDef)) {
