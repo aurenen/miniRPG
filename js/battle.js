@@ -39,15 +39,15 @@ function enemy()
   }
   if (myCurrentHP < 0) myCurrentHP = 0;
 
-  if ( dmg == 0 || dodge(enemyAtk, myDef) )
-    document.getElementById('battle-text').innerHTML = "<b>You</b> dodged!";
-  else {
+  if ( dmg != 0 && !dodge(enemyAtk, myDef) ) {
     document.getElementById('battle-text').innerHTML = "<b>You</b> are hit for " + dmg + " hp";
     attackanimation('battle-attack-user', 'slash');
     enemyattack(enemyId);
     document.getElementById('playerHP').innerHTML = myCurrentHP;
     document.getElementById('playerHPbar').style.width= myCurrentHP / myTotalHP * 100 + "%";
   }
+  else  
+    document.getElementById('battle-text').innerHTML = "<b>You</b> dodged!";
   document.getElementById('battle-text').style.background = "Tomato";
 
   if (myCurrentHP == 0) {
@@ -74,14 +74,14 @@ function attack(factor) {
   }
 
   if (myCurrentSP > 0) {
-    if ( dmg == 0 || dodge(myAtk, enemyDef) )
-      document.getElementById('battle-text').innerHTML = "<b>Enemy</b> dodged!";
-    else {
+    if ( dmg != 0 && !dodge(myAtk, enemyDef) ) {
       document.getElementById('battle-text').innerHTML = "<b>Enemy</b> hit for " + dmg + " hp";
       attackanimation('battle-attack-monster', 'fire');
       document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
       document.getElementById('monsterHPbar').style.width= enemyCurrentHP / enemyTotalHP * 100 + "%";
     }
+    else
+      document.getElementById('battle-text').innerHTML = "<b>Enemy</b> dodged!";
     document.getElementById('battle-text').style.background = "SpringGreen";
   }
 
