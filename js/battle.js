@@ -33,20 +33,20 @@ function enemyattack(m)
 function enemy()
 {
   var dmg = Math.floor(((Math.random())*10) * myLevel); // [1-10]
-  if (myCurrentHP > 0) {
-    if (!dodge(enemyAtk, myDef))
+  if (myCurrentHP > 0 && !dodge(enemyAtk, myDef)) {
+    // if (!dodge(enemyAtk, myDef))
       myCurrentHP -= dmg;
   }
   if (myCurrentHP < 0) myCurrentHP = 0;
-  document.getElementById('playerHP').innerHTML = myCurrentHP;
-  document.getElementById('playerHPbar').style.width= myCurrentHP / myTotalHP * 100 + "%";
 
-  if (dodge(enemyAtk, myDef) || dmg == 0)
+  if ( dmg == 0 || dodge(enemyAtk, myDef) )
     document.getElementById('battle-text').innerHTML = "<b>You</b> dodged!";
   else {
     document.getElementById('battle-text').innerHTML = "<b>You</b> are hit for " + dmg + " hp";
     attackanimation('battle-attack-user', 'slash');
     enemyattack(enemyId);
+    document.getElementById('playerHP').innerHTML = myCurrentHP;
+    document.getElementById('playerHPbar').style.width= myCurrentHP / myTotalHP * 100 + "%";
   }
   document.getElementById('battle-text').style.background = "Tomato";
 
@@ -68,18 +68,19 @@ function attack(factor) {
       enemyCurrentHP -= dmg;
   }
   if (enemyCurrentHP < 0) enemyCurrentHP = 0;
-  document.getElementById("battle-user").src="images/ani/" + myClass + "_attack.gif";
-  setTimeout(function(){document.getElementById("battle-user").src="images/ani/" + myClass + "_idle.gif"}, 1000);
-
-  document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
-  document.getElementById('monsterHPbar').style.width= enemyCurrentHP / enemyTotalHP * 100 + "%";
+  if (!dodge(myAtk, enemyDef)) {
+    document.getElementById("battle-user").src="images/ani/" + myClass + "_attack.gif";
+    setTimeout(function(){document.getElementById("battle-user").src="images/ani/" + myClass + "_idle.gif"}, 1000);
+  }
 
   if (myCurrentSP > 0) {
-    if (dodge(myAtk, enemyDef) || dmg == 0)
+    if ( dmg == 0 || dodge(myAtk, enemyDef) )
       document.getElementById('battle-text').innerHTML = "<b>Enemy</b> dodged!";
     else {
       document.getElementById('battle-text').innerHTML = "<b>Enemy</b> hit for " + dmg + " hp";
       attackanimation('battle-attack-monster', 'fire');
+      document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
+      document.getElementById('monsterHPbar').style.width= enemyCurrentHP / enemyTotalHP * 100 + "%";
     }
     document.getElementById('battle-text').style.background = "SpringGreen";
   }
