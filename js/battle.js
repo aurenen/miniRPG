@@ -83,9 +83,10 @@ function attack(factor) {
     else
       document.getElementById('battle-text').innerHTML = "<b>Enemy</b> dodged!";
     document.getElementById('battle-text').style.background = "SpringGreen";
-    document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
-    document.getElementById('monsterHPbar').style.width= enemyCurrentHP / enemyTotalHP * 100 + "%";
   }
+
+  document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
+  document.getElementById('monsterHPbar').style.width= enemyCurrentHP / enemyTotalHP * 100 + "%";
 
   if (enemyCurrentHP == 0) {
     alert("You win!");
