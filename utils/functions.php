@@ -226,8 +226,8 @@ function getRanking() {
     while ($stmt->fetch()) { 
         foreach($row as $key => $val) { 
             $c[$i][$key] = $val; 
-            $i++;
         } 
+        $i++;
         $ranking = $c; 
     }
 
