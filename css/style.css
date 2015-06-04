@@ -59,9 +59,10 @@ th.battle-chara-name {
 
 #battle-text {
     margin: auto;
-    padding: 20px 10px;
+    padding: 25px 10px;
     width: 200px;
     background-color: #eee;
+    border: 3px solid #444;
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     border-radius: 10px; /* future proofing */
