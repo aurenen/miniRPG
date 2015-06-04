@@ -215,24 +215,26 @@ function getRanking() {
     if (!$stmt->execute())
         fail('MySQL getProfile execute', $stmt->error);
 
-    // $meta = $stmt->result_metadata(); 
+    $meta = $stmt->result_metadata(); 
 
-    // while ($field = $meta->fetch_field()) { 
-    //     $params[] = &$row[$field->name]; 
-    // } 
+    while ($field = $meta->fetch_field()) { 
+        $params[] = &$row[$field->name]; 
+    } 
 
-    // call_user_func_array(array($stmt, 'bind_result'), $params);            
-    // while ($stmt->fetch()) { 
-    //     foreach($row as $key => $val) { 
-    //         $c[$key] = $val; 
-    //     } 
-    //     $ranking = $c; 
-    // }
+    $i = 0;
+    call_user_func_array(array($stmt, 'bind_result'), $params);            
+    while ($stmt->fetch()) { 
+        foreach($row as $key => $val) { 
+            $c[$i][$key] = $val; 
+            $i++;
+        } 
+        $ranking = $c; 
+    }
 
-    $result = $stmt->get_result();
     // $stmt->fetch();
-    $ranking = $result->fetch_all(MYSQLI_ASSOC);
-    $result->free(); 
+    // $result = $stmt->get_result();
+    // $ranking = $result->fetch_all(MYSQLI_ASSOC);
+    // $result->free(); 
     $stmt->close();
     db_disconnect();
     return $ranking;
