@@ -33,6 +33,7 @@ function enemyattack(m)
 function enemy()
 {
   var dmg = Math.floor(((Math.random())*10) * myLevel); // [1-10]
+  if (dodge(enemyAtk, myDef)) dmg = 0;
   if (myCurrentHP > 0 && !dodge(enemyAtk, myDef)) {
     // if (!dodge(enemyAtk, myDef))
       myCurrentHP -= dmg;
@@ -43,12 +44,12 @@ function enemy()
     document.getElementById('battle-text').innerHTML = "<b>You</b> are hit for " + dmg + " hp";
     attackanimation('battle-attack-user', 'slash');
     enemyattack(enemyId);
-    document.getElementById('playerHP').innerHTML = myCurrentHP;
-    document.getElementById('playerHPbar').style.width= myCurrentHP / myTotalHP * 100 + "%";
   }
   else  
     document.getElementById('battle-text').innerHTML = "<b>You</b> dodged!";
   document.getElementById('battle-text').style.background = "Tomato";
+  document.getElementById('playerHP').innerHTML = myCurrentHP;
+  document.getElementById('playerHPbar').style.width= myCurrentHP / myTotalHP * 100 + "%";
 
   if (myCurrentHP == 0) {
     alert("You lose!");
@@ -58,6 +59,7 @@ function enemy()
 
 function attack(factor) {
   var dmg = Math.floor(((Math.random())*10) + 1 * factor * myLevel); // [1-10]
+  if (dodge(myAtk, enemyDef)) dmg = 0;
   if (enemyCurrentHP > 0) {
     spcost(5 * factor);
     if (myCurrentSP <= 0) {
@@ -77,12 +79,12 @@ function attack(factor) {
     if ( dmg != 0 && !dodge(myAtk, enemyDef) ) {
       document.getElementById('battle-text').innerHTML = "<b>Enemy</b> hit for " + dmg + " hp";
       attackanimation('battle-attack-monster', 'fire');
-      document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
-      document.getElementById('monsterHPbar').style.width= enemyCurrentHP / enemyTotalHP * 100 + "%";
     }
     else
       document.getElementById('battle-text').innerHTML = "<b>Enemy</b> dodged!";
     document.getElementById('battle-text').style.background = "SpringGreen";
+    document.getElementById('monsterHP').innerHTML = enemyCurrentHP;
+    document.getElementById('monsterHPbar').style.width= enemyCurrentHP / enemyTotalHP * 100 + "%";
   }
 
   if (enemyCurrentHP == 0) {
