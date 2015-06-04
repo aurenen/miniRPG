@@ -622,8 +622,8 @@ function setStats($uid, $type) {
     define("ROG", 6);
 
     $hp; $sp; $str; $vit; $dex; $agi; $cun; $wis; $exp = 0;
-    if (!isNew($uid))
-        $exp = getExp($uid);
+    // if (!isNew($uid))
+    //     $exp = getExp($uid);
     // stats start out from a total of 30 points (avg of 5 pts * 6 areas)
     switch ($type) {
         case WAR:
