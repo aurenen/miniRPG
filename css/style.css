@@ -75,6 +75,8 @@ th.battle-chara-name {
     left: 10%;
     width: 30%;
     height: 300px;
+    width: 30%;
+    background-size: 90%;
 }
 
 #battle-attack-monster {
@@ -83,11 +85,13 @@ th.battle-chara-name {
     right: 10%;
     width: 30%;
     height: 300px;
+    width: 30%;
+    background-size: 90%;
 }
 
 .battle-fire {
     background-image: url('../images/ani/fire.gif');
-    background-position: 50% 50%;
+    background-position: center bottom;
     background-repeat: no-repeat;
 }
 .battle-cut {
