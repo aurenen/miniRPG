@@ -83,19 +83,19 @@ include_once "header.php";
             <div class="row">
               <div class="col-sm-3">
                 <p>An elemental move based on magic</p>
-                <button id="skill-1" class="btn btn-default btn-block" onclick="attack(1); return false;"><?php echo $skills[$class_num][0] ?> (5 SP)</button>
+                <button id="skill-1" class="btn btn-info btn-block" onclick="attack(1); return false;"><?php echo $skills[$class_num][0] ?> (5 SP)</button>
               </div>
               <div class="col-sm-3">
                 <p>Restore half of your Skill Points</p>
-                <button id="skill-2" class="btn btn-default btn-block" onclick="recoversp(); return false;">SP Recovery (0 SP)</button>
+                <button id="skill-2" class="btn btn-info btn-block" onclick="recoversp(); return false;">SP Recovery (0 SP)</button>
               </div>
               <div class="col-sm-3">
                 <p>An elemental move based on magic</p>
-                <button id="skill-3" class="btn btn-default btn-block" onclick="attack(2); return false;"><?php echo $skills[$class_num][1] ?> (10 SP)</button>
+                <button id="skill-3" class="btn btn-info btn-block" onclick="attack(2); return false;"><?php echo $skills[$class_num][1] ?> (10 SP)</button>
               </div>
               <div class="col-sm-3">
                 <p>Restore a portion of your Health</p>
-                <button id="skill-4" class="btn btn-default btn-block" onclick="recoverhp(); return false;">HP Recovery  (5 SP)</button>
+                <button id="skill-4" class="btn btn-info btn-block" onclick="recoverhp(); return false;">HP Recovery  (5 SP)</button>
               </div>
             </div>
           </div>
