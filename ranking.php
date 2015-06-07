@@ -37,15 +37,16 @@ include_once "header.php";
     <tbody>
   <?php 
   $rank = getRanking();
+
   $i = 1;
   foreach ($rank as $r) {
     echo "<tr>\n";
     echo "<th scope=\"row\">". $i ."</th><td>" . 
-          $r["character_name"] . "</td><td>" . 
-          $r["level"] . "</td><td>" . 
-          $r["exp"] . "</td><td>" . 
-          $r["type"] . "</td><td>" . 
-          $r["money"] . "</td>";
+          $r[character_name] . "</td><td>" . 
+          $r[level] . "</td><td>" . 
+          $r[exp] . "</td><td>" . 
+          $r[type] . "</td><td>" . 
+          $r[money] . "</td>";
     echo "</tr>\n";
     $i++;
   }
