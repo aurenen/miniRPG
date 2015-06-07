@@ -6,7 +6,7 @@ if( isLogged() && !isNew($_SESSION['uid']) ) {
   $profile = getProfile($_SESSION['uid']);
   $stats = getStats($_SESSION['uid']);
   $user_atk = floor(($stats["str"] + $stats["dex"] / 5) + ($stats["wis"] / 3) + ($profile["level"] / 4));
-  $user_def = floor(($stats["agi"] * 0.35) + max($stats["vit"] * 0.3, (pow($stats["vit"], 2) / 170) - 1) + ($stats["cun"] * 0.25));
+  $user_def = floor(($stats["agi"] * 0.15) + max($stats["vit"] * 0.3, (pow($stats["vit"], 2) / 170) - 1) + ($stats["cun"] * 0.25));
   $chara_class = strtolower(getClass($_SESSION['uid']));
   $user_exp = getExp($_SESSION['uid']);
   $class_num = $profile["character_class"] - 1;
