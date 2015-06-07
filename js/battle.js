@@ -32,8 +32,16 @@ function enemyattack(m)
   setTimeout(function(){document.getElementById("battle-enemy").src="images/ani/monster" + m + "_idle.gif"}, 1000);
 }
 
+function noSpam(status) {
+  document.getElementById("skill-1").disabled = status;
+  document.getElementById("skill-2").disabled = status;
+  document.getElementById("skill-3").disabled = status;
+  document.getElementById("skill-4").disabled = status;
+}
+
 function enemy()
 {
+  noSpam(false);
   var dmg = Math.floor(((Math.random())*10) * myLevel); // [1-10]
   if (dodge(enemyAtk, myDef)) dmg = 0;
   if (myCurrentHP > 0 && !dodge(enemyAtk, myDef)) {
@@ -60,6 +68,8 @@ function enemy()
 }
 
 function attack(factor) {
+  noSpam(true);
+
   var dmg = Math.floor(((Math.random())*10) + 1 * factor * myLevel); // [1-10]
   if (dodge(myAtk, enemyDef)) dmg = 0;
   if (enemyCurrentHP > 0) {
@@ -100,8 +110,8 @@ function attack(factor) {
 
 }
 
-function recoverhp()
-{
+function recoverhp() {
+  noSpam(true);
   spcost(5);
   if (myCurrentSP <= 0) {
     alert("Out of SP!");
@@ -116,8 +126,8 @@ function recoverhp()
   setTimeout(enemy, 1000);
 }
 
-function recoversp()
-{
+function recoversp() {
+  noSpam(true);
   myCurrentSP += myTotalSP * .2;
   if (myCurrentSP > myTotalSP) myCurrentSP = myTotalSP;
   document.getElementById('playerSP').innerHTML = myCurrentSP;
