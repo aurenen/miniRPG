@@ -12,7 +12,7 @@ function spcost(points)
 
 function dodge(atk, def)
 {
-  atk = (Math.floor(Math.random() * 10) + 1) + atk - Math.floor(Math.random() * 10);
+  atk = (Math.floor(Math.random() * 15) + 1) + atk - Math.floor(Math.random() * 10);
   def = (Math.floor(Math.random() * 10) + 1) + def - Math.floor(Math.random() * 10);
   if (def >= atk)
     return true;
