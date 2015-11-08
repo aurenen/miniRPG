@@ -1,3 +1,6 @@
+# Notes
+This is basically a learning experiment for my senior project. It works but uses some pretty hacky methods which I do not recommend. You're free to use and play with if you'd like, but I plan on working on a better version of this in the future, and redesign the whole thing.
+
 # miniRPG
 For senior sem
 
